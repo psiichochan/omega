@@ -1,6 +1,5 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+/* eslint-disable prettier/prettier */
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -9,22 +8,27 @@ import {
   Button,
   FlatList,
   ToastAndroid,
-} from "react-native";
-import { Card } from "react-native-paper";
-import RNPickerSelect from "react-native-picker-select";
+  ActivityIndicator,
+} from 'react-native';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Card} from 'react-native-paper';
+import RNPickerSelect from 'react-native-picker-select';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
+} from 'react-native-responsive-screen';
+
 const BorrowScreen = () => {
-  const [borrowAmount, setBorrowAmount] = useState("");
-  const [borrowNote, setBorrowNote] = useState("");
-  const [totalBorrowAmount, setTotalBorrowAmount] = useState("");
+  const [borrowAmount, setBorrowAmount] = useState('');
+  const [borrowNote, setBorrowNote] = useState('');
+  const [totalBorrowAmount, setTotalBorrowAmount] = useState('');
   const [borrowApprovedRecords, setBorrowApprovedRecords] = useState([]);
-  const [selectedFilter, setSelectedFilter] = useState("all");
+  const [selectedFilter, setSelectedFilter] = useState('all');
+  const [loading, setLoading] = useState(true);
 
   const postBorrowerDetails = async () => {
-    const userDetails = await AsyncStorage.getItem("UserDetails");
+    const userDetails = await AsyncStorage.getItem('UserDetails');
     const allDetails = JSON.parse(userDetails);
 
     const currentDate = new Date();
@@ -35,27 +39,33 @@ const BorrowScreen = () => {
       note: borrowNote,
       borrowerName: `${allDetails.firstName} ${allDetails.lastName}`,
       borrowedDate: dateString,
-      returnDate: "",
+      returnDate: '',
       userId: allDetails.id,
     };
 
-    console.log("requestBody: ", requestBody);
-
-    const response = await axios.post(
-      "http://3.6.89.38:9090/api/v1/borrowing/addBorrowing",
-      requestBody,
-      {
-        headers: {
-          "Content-Type": "application/json",
+    try {
+      const response = await axios.post(
+        'http://3.6.89.38:9090/api/v1/borrowing/addBorrowing',
+        requestBody,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
         },
-      }
-    );
-    if (response.status === 200) {
-      ToastAndroid.showWithGravity(
-        "Borrow request raised",
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER
       );
+
+      if (response.status === 200) {
+        ToastAndroid.showWithGravity(
+          'Borrow request raised',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+        // Clear the input fields after successful borrow
+        setBorrowAmount('');
+        setBorrowNote('');
+      }
+    } catch (error) {
+      console.error('Error posting borrowing details:', error);
     }
   };
 
@@ -67,22 +77,38 @@ const BorrowScreen = () => {
       if (response.status === 200) {
         setTotalBorrowAmount(response.data.totalAmount);
         setBorrowApprovedRecords(response.data.data.reverse());
+      } else if (response.status === 204 || response.status === 404) {
+        ToastAndroid.showWithGravity(
+          'No data present',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+        setBorrowApprovedRecords([]);
       } else {
         console.log(
-          "Failed to fetch expenses list. Server response:",
-          response.status
+          'Failed to fetch expenses list. Server response:',
+          response.status,
         );
       }
     } catch (error) {
-      console.error("Error fetching expenses list:", error);
+      console.error('Error fetching expenses list 123:', error);
+      ToastAndroid.showWithGravity(
+        'No data present',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+      setBorrowApprovedRecords([]);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
+    setLoading(true);
     getBorrowApprovedList();
   }, [selectedFilter]);
 
-  const renderItem = ({ item }) => (
+  const renderItem = ({item}) => (
     <Card style={styles.recordCard}>
       <Card.Content>
         <Text style={styles.recordAmount}>Name: {item.borrowerName}</Text>
@@ -100,43 +126,48 @@ const BorrowScreen = () => {
           placeholder="Enter Borrow amount"
           keyboardType="numeric"
           value={borrowAmount}
-          onChangeText={(text) => setBorrowAmount(text.replace(/[^0-9]/g, ""))}
+          onChangeText={text => setBorrowAmount(text.replace(/[^0-9 ]/g, ''))}
         />
         <TextInput
           style={styles.input}
           placeholder="Enter Borrow Note"
           value={borrowNote}
-          onChangeText={(text) =>
-            setBorrowNote(text.replace(/[^a-zA-Z0-9]/g, ""))
-          }
+          onChangeText={text => setBorrowNote(text)}
         />
         <Button
           title="Borrow"
+          color="#00539C"
           onPress={postBorrowerDetails}
-          disabled={borrowAmount === ""}
+          disabled={borrowAmount === ''}
         />
       </View>
 
       <RNPickerSelect
-        placeholder={{ label: "Select Filter", value: null }}
-        onValueChange={(value) => setSelectedFilter(value)}
+        placeholder={{label: 'Select Filter', value: null}}
+        style={{color: 'black'}}
+        onValueChange={value => setSelectedFilter(value)}
         items={[
-          { label: "Day", value: "day" },
-          { label: "Week", value: "week" },
-          { label: "Month", value: "month" },
-          { label: "All", value: "all" },
+          {label: 'Day', value: 'day'},
+          {label: 'Week', value: 'week'},
+          {label: 'Month', value: 'month'},
+          {label: 'All', value: 'all'},
         ]}
       />
-      <Text style={{ fontSize: 15, fontWeight: "bold" }}>
-        Total Borrow Amount: {totalBorrowAmount}
+      <Text style={styles.totalBorrowAmount}>
+        Total Borrow Amount:{' '}
+        <Text style={styles.amount}>{totalBorrowAmount}</Text>
       </Text>
       <View style={styles.recordsSection}>
         <Text style={styles.sectionTitle}>Borrow Records</Text>
-        <FlatList
-          data={borrowApprovedRecords}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => index.toString()}
-        />
+        {loading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <FlatList
+            data={borrowApprovedRecords}
+            renderItem={renderItem}
+            keyExtractor={(item, index) => index.toString()}
+          />
+        )}
       </View>
     </View>
   );
@@ -146,35 +177,45 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: "white",
-    marginTop: hp(5),
+    backgroundColor: 'white',
   },
+  amount: {fontSize: 17, color: 'black', fontWeight: '800'},
+  totalBorrowAmount: {fontSize: 18, fontWeight: 'bold', color: 'black'},
   section: {
     marginBottom: 20,
     top: 10,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 10,
+    color: 'black',
   },
   input: {
     height: 40,
-    borderColor: "gray",
+    borderColor: 'black',
     borderWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,
+    color: 'black',
+    fontSize: 13,
+    fontWeight: '600',
+    borderRadius: 10,
   },
   recordsSection: {
     flex: 1,
     marginTop: 20,
   },
   recordCard: {
-    marginVertical: 5,
+    width: wp(90),
+    marginVertical: 10,
+    backgroundColor: '#00539C',
+    borderRadius: 10,
   },
   recordAmount: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
+    color: '#E2D1F9',
   },
 });
 

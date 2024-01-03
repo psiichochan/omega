@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+/* eslint-disable prettier/prettier */
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Image,
@@ -6,51 +7,47 @@ import {
   Text,
   TouchableOpacity,
   ActivityIndicator,
-} from "react-native";
-import * as ImagePicker from "expo-image-picker";
-import axios from "axios";
-import { ToastAndroid } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+  ScrollView,
+} from 'react-native';
+import ImagePicker from 'react-native-image-crop-picker';
+import axios from 'axios';
+import {ToastAndroid} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
+} from 'react-native-responsive-screen';
 
-const PaymentQRScreen = ({ navigation, route }) => {
-  const { donationAmount, date, donationNote } = route.params;
+const PaymentQRScreen = ({navigation, route}) => {
+  const {donationAmount, date, donationNote} = route.params;
   // console.log(donationAmount, "ss");
   const [paymentImage, setPaymentImage] = useState(null);
-  const [imageName, setImageName] = useState("");
+  const [imageName, setImageName] = useState('');
   const [bankDetails, setBankDetails] = useState([]);
 
-  const selectPaymentImage = async () => {
+  const extractImageName = path => {
+    const pathArray = path.split('/');
+    const filename = pathArray[pathArray.length - 1];
+    return filename;
+  };
+
+  const handleImageUpload = async () => {
     try {
-      const permissionResult =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-      if (permissionResult.granted === false) {
-        ToastAndroid.showWithGravity(
-          "Permission to access media library is required",
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER
-        );
-        return;
-      }
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 1,
+      const image = await ImagePicker.openPicker({
+        width: 300,
+        height: 300,
+        cropping: true,
       });
 
-      if (!result.cancelled) {
-        setPaymentImage(result.uri);
-        const imageName = result.uri.split("/").pop();
-        setImageName(imageName);
+      if (image) {
+        const name = extractImageName(image.path);
+        const imagePath = image.path;
+        setPaymentImage(imagePath);
+
+        setImageName(name);
       }
     } catch (error) {
-      console.log("ImagePicker Error: ", error);
+      console.log('ImagePicker Error: ', error);
     }
   };
 
@@ -59,19 +56,19 @@ const PaymentQRScreen = ({ navigation, route }) => {
 
   const getBankDetails = async () => {
     try {
-      const response = await axios.get("http://3.6.89.38:9090/api/v1/bank/get");
+      const response = await axios.get('http://3.6.89.38:9090/api/v1/bank/get');
       if (response.status === 200) {
         setBankDetails(response.data[0]);
-        console.log(response.data[0]);
+        // console.log(response.data[0]);
       } else {
         console.log(
-          "Error saving bank details:",
+          'Error saving bank details:',
           response.status,
-          response.statusText
+          response.statusText,
         );
       }
     } catch (error) {
-      console.error("Error during API request:", error);
+      console.error('Error during API request:', error);
     }
   };
 
@@ -103,133 +100,111 @@ const PaymentQRScreen = ({ navigation, route }) => {
   async function ImageUpload() {
     try {
       const formData = new FormData();
-      formData.append("file", {
+      formData.append('file', {
         uri: paymentImage,
         name: imageName,
-        fileName: "image",
-        type: "image/jpg",
+        fileName: 'image',
+        type: 'image/jpg',
       });
-      console.log("response image", imageName);
       const response = await axios.post(
-        "http://3.6.89.38:9090/api/v1/fileAttachment/file",
+        'http://3.6.89.38:9090/api/v1/fileAttachment/file',
         formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            'Content-Type': 'multipart/form-data',
           },
-        }
+        },
       );
-      // console.log("response image", response.status);
       if (response.status === 200) {
-        console.log("response image", response.data);
+        console.log('response image', response.data);
         ToastAndroid.showWithGravity(
-          "QR Code Uploaded successfully!",
+          'QR Code Uploaded successfully!',
           ToastAndroid.SHORT,
-          ToastAndroid.CENTER
+          ToastAndroid.CENTER,
         );
-        console.log("QR Code Uploaded successfully!");
+        console.log('QR Code Uploaded successfully!');
       } else {
         ToastAndroid.showWithGravity(
           `Error Uploading QR Code: ${response.status} ${response.statusText}`,
           ToastAndroid.SHORT,
-          ToastAndroid.CENTER
+          ToastAndroid.CENTER,
         );
         console.log(
-          "Error Uploading QR Code:",
+          'Error Uploading QR Code:',
           response.status,
-          response.statusText
+          response.statusText,
         );
       }
     } catch (error) {
       ToastAndroid.showWithGravity(
         `Error Uploading QR Code: ${error}`,
         ToastAndroid.SHORT,
-        ToastAndroid.CENTER
+        ToastAndroid.CENTER,
       );
-      console.error("Error during API request:", error);
-    } finally {
-      setLoadingImage(false);
+      console.error('Error during API request:', error);
     }
   }
 
   async function saveDonation() {
     setIsLoading(true);
-    const userDetails = await AsyncStorage.getItem("UserDetails");
+    const userDetails = await AsyncStorage.getItem('UserDetails');
     const allDetails = JSON.parse(userDetails);
 
     try {
       const donationBody = {
-        username: allDetails.firstName,
+        username: allDetails.username,
         amount: donationAmount,
         note: donationNote,
         screenshot: imageName,
         date: date,
       };
       const response = await axios.post(
-        `http://3.6.89.38:9090/api/v1/donation/save`,
-        donationBody
+        'http://3.6.89.38:9090/api/v1/donation/save',
+        donationBody,
       );
       if (response.status === 200) {
         ImageUpload();
         ToastAndroid.showWithGravity(
-          "Donation added successfully",
+          'Donation added successfully',
           ToastAndroid.SHORT,
-          ToastAndroid.CENTER
+          ToastAndroid.CENTER,
         );
-        console.log("response", response);
         navigation.goBack();
       }
     } catch (error) {
       ToastAndroid.showWithGravity(
-        "Something went wrong ${error}",
+        'Something went wrong ${error}',
         ToastAndroid.SHORT,
-        ToastAndroid.CENTER
+        ToastAndroid.CENTER,
       );
-      console.log("tt", error);
+      console.log('tt', error);
     } finally {
       setIsLoading(false);
     }
   }
 
   return (
-    <View style={styles.containerMain}>
+    <ScrollView contentContainerStyle={{flexGrow: 1}}>
       <Text style={styles.payUsing}>Please Pay Using Below QR</Text>
-      <Text style={[styles.payUsing, { paddingTop: 20 }]}>
-        Amount : NPR {donationAmount}
-      </Text>
-      <Image source={{ uri: imageUrl }} style={styles.imageQR} />
+      <Text style={styles.payUsing}>Amount : NPR {donationAmount}</Text>
+      <Image source={{uri: imageUrl}} style={styles.imageQR} />
 
-      <View style={[{ top: 100, left: 10 }]}>
-        <Text style={{ textAlign: "center", fontSize: 20, fontWeight: "bold" }}>
-          OR
-        </Text>
+      <View style={styles.innerContainer}>
+        <Text style={styles.Or}>OR</Text>
         <View>
-          <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-            Bank Account Details:
-          </Text>
-          <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-            Name: {bankDetails.name}
-          </Text>
+          <Text style={styles.bankDetails}>Bank Account Details:</Text>
+          <Text style={styles.bankDetails}>Name: {bankDetails.name}</Text>
 
-          <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+          <Text style={styles.bankDetails}>
             Account no: {bankDetails.accountNo}
           </Text>
-          <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+          <Text style={styles.bankDetails}>
             IFSC Code: {bankDetails.ifscCode}
           </Text>
-          <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-            UPI Id: {bankDetails.upiId}
-          </Text>
+          <Text style={styles.bankDetails}>UPI Id: {bankDetails.upiId}</Text>
         </View>
-        <View style={{ top: 20 }}>
-          <Text
-            style={{
-              textAlign: "center",
-              right: 10,
-              fontSize: 15,
-              fontWeight: "bold",
-            }}
-          >
+        <View style={styles.hello}>
+          <Text style={styles.longText}>
             After Making Payment Please Upload the ScreenShot By Clicking Below
             Button
           </Text>
@@ -237,12 +212,11 @@ const PaymentQRScreen = ({ navigation, route }) => {
 
         {/* Image Upload Section */}
         {paymentImage && (
-          <Image source={{ uri: paymentImage }} style={styles.uploadedImage} />
+          <Image source={{uri: paymentImage}} style={styles.uploadedImage} />
         )}
         <TouchableOpacity
           style={styles.uploadButton}
-          onPress={selectPaymentImage}
-        >
+          onPress={handleImageUpload}>
           <Text style={styles.uploadText}>Upload Payment Screenshot</Text>
         </TouchableOpacity>
         {loading === true ? (
@@ -253,9 +227,7 @@ const PaymentQRScreen = ({ navigation, route }) => {
           </TouchableOpacity>
         )}
       </View>
-
-      {/* <Button /> */}
-    </View>
+    </ScrollView>
   );
 };
 
@@ -263,53 +235,67 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
 
-    backgroundColor: "white",
+    backgroundColor: 'white',
   },
-  containerMain: {
-    flex: 1,
-    height: "auto",
-    backgroundColor: "white",
-    marginTop: hp(5),
+  longText: {
+    textAlign: 'center',
+    right: 10,
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  hello: {
+    top: hp(2),
+  },
+
+  innerContainer: {top: 100, left: 10},
+  Or: {
+    textAlign: 'center',
+    fontSize: hp(4),
+    fontWeight: 'bold',
+    color: 'black',
   },
   imageQR: {
-    width: 200,
-    height: 200,
-    alignSelf: "center",
+    width: wp(50),
+    height: hp(20),
+    alignSelf: 'center',
     top: 80,
   },
+  bankDetails: {fontSize: 20, fontWeight: 'bold', color: 'black'},
   payUsing: {
     fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "center",
+    fontWeight: 'bold',
+    textAlign: 'center',
     top: 20,
+    color: 'black',
   },
   uploadButton: {
-    marginTop: 30,
-    backgroundColor: "#4285f4",
+    marginTop: hp(3),
+    backgroundColor: '#00539C',
     padding: 10,
     borderRadius: 5,
-    alignSelf: "center",
+    alignSelf: 'center',
   },
   submitBtn: {
-    marginTop: 40,
-    backgroundColor: "green",
+    marginTop: hp(3),
+    backgroundColor: '#00539C',
     padding: 10,
     borderRadius: 5,
     width: 200,
-    alignSelf: "center",
+    alignSelf: 'center',
   },
 
   uploadText: {
-    color: "white",
-    textAlign: "center",
+    color: 'white',
+    textAlign: 'center',
     fontSize: 16,
   },
   uploadedImage: {
-    width: 200,
-    height: 100,
-    marginTop: 10,
-    top: 20,
-    resizeMode: "contain",
+    width: wp(30),
+    height: hp(20),
+    // marginTop: 10,
+    resizeMode: 'contain',
+    alignSelf: 'center',
   },
 });
 

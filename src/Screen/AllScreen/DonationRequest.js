@@ -1,9 +1,9 @@
+/* eslint-disable prettier/prettier */
 // DonationRequestScreen.js
 
-import axios from "axios";
-import React, { useState, useEffect } from "react";
+import axios from 'axios';
+import React, {useState, useEffect} from 'react';
 import {
-  ScrollView,
   View,
   Text,
   Image,
@@ -11,14 +11,14 @@ import {
   TouchableOpacity,
   FlatList,
   ToastAndroid,
-} from "react-native";
+} from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
+} from 'react-native-responsive-screen';
 
-function DonationCard({ donation, onUpdate, donationGet }) {
-  const handleUpdate = (status) => {
+function DonationCard({donation, onUpdate, donationGet}) {
+  const handleUpdate = status => {
     onUpdate(
       donation.id,
       status,
@@ -26,10 +26,10 @@ function DonationCard({ donation, onUpdate, donationGet }) {
       donation.amount,
       donation.note,
       donation.screenshot,
-      donation.date
+      donation.date,
     );
     donationGet();
-    console.log("this is donation ID: ", donation.id);
+    console.log('this is donation ID: ', donation.id);
   };
 
   const [imageUrl, setImageUrl] = useState();
@@ -48,9 +48,9 @@ function DonationCard({ donation, onUpdate, donationGet }) {
       setImageUrl(profileData);
     } else {
       ToastAndroid.showWithGravity(
-        "Login Successfully",
+        'Login Successfully',
         ToastAndroid.SHORT,
-        ToastAndroid.CENTER
+        ToastAndroid.CENTER,
       );
     }
     return profileData;
@@ -58,31 +58,29 @@ function DonationCard({ donation, onUpdate, donationGet }) {
 
   useEffect(() => {
     GetMyProfileData();
-  }, []);
+  });
 
   const dateString = donation.date;
-  const [datePart, timePart] = dateString.split("T");
+  const [datePart] = dateString.split('T');
 
   return (
     <View style={styles.card}>
       <Text style={styles.amount}>{`Name: ${donation.username}`}</Text>
       <Text style={styles.amount}>{`Date: ${datePart}`}</Text>
-      <Image style={styles.paymentImage} source={{ uri: imageUrl }} />
+      <Image style={styles.paymentImage} source={{uri: imageUrl}} />
       <Text style={styles.amount}>{`Amount: ${donation.amount}`}</Text>
-      <Text style={styles.note}>{`Note: ${donation.note}`}</Text>
+      <Text style={styles.amount}>{`Note: ${donation.note}`}</Text>
 
       {/* Approve and Decline Buttons */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.approveButton}
-          onPress={() => handleUpdate(true)}
-        >
+          onPress={() => handleUpdate(true)}>
           <Text style={styles.buttonText}>Approve</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.declineButton}
-          onPress={() => handleUpdate(false)}
-        >
+          onPress={() => handleUpdate(false)}>
           <Text style={styles.buttonText}>Decline</Text>
         </TouchableOpacity>
       </View>
@@ -93,12 +91,11 @@ function DonationCard({ donation, onUpdate, donationGet }) {
 function DonationRequestScreen() {
   const [donations, setDonations] = useState([]);
   const [statusDonation, setStatusDonation] = useState(false);
-  const [approved, setApproved] = useState(false);
 
   async function donationGet() {
     try {
       const response = await axios.get(
-        `http://3.6.89.38:9090/api/v1/donation/get/unapproved`
+        'http://3.6.89.38:9090/api/v1/donation/get/unapproved',
       );
       if (response.status === 200) {
         const data = response.data;
@@ -108,14 +105,14 @@ function DonationRequestScreen() {
         ToastAndroid.showWithGravity(
           response.statusText,
           ToastAndroid.SHORT,
-          ToastAndroid.CENTER
+          ToastAndroid.CENTER,
         );
       }
     } catch {
       ToastAndroid.showWithGravity(
-        "Error Or No Request",
+        'Error Or No Request',
         ToastAndroid.SHORT,
-        ToastAndroid.CENTER
+        ToastAndroid.CENTER,
       );
     }
   }
@@ -130,7 +127,7 @@ function DonationRequestScreen() {
     amount,
     note,
     screenshot,
-    date
+    date,
   ) => {
     try {
       setStatusDonation(status);
@@ -143,61 +140,40 @@ function DonationRequestScreen() {
         date: date,
         status: status,
       };
-      console.log("request Body: ", requestBody);
+      console.log('request Body: ', requestBody);
       const response = await axios.put(
-        `http://3.6.89.38:9090/api/v1/donation/update`,
+        'http://3.6.89.38:9090/api/v1/donation/update',
         requestBody,
         {
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
-        }
+        },
       );
 
       if (response.status === 200) {
         ToastAndroid.showWithGravity(
-          "Donation Approved Successfully",
+          'Donation Approved Successfully',
           ToastAndroid.SHORT,
-          ToastAndroid.CENTER
+          ToastAndroid.CENTER,
         );
       }
 
-      setDonations((prevDonations) =>
-        prevDonations.filter((donation) => donation.id !== donationId)
+      setDonations(prevDonations =>
+        prevDonations.filter(donation => donation.id !== donationId),
       );
       donationGet();
-      console.log(`Donation ${donationId} ${status ? "approved" : "declined"}`);
+      console.log(`Donation ${donationId} ${status ? 'approved' : 'declined'}`);
     } catch (error) {
-      console.error("Error updating donation:", error);
+      console.error('Error updating donation:', error);
     }
   };
 
   return (
     <View style={styles.container}>
-      <View
-        style={{
-          backgroundColor: "#b981c7",
-          width: wp(90),
-          height: hp(5),
-          borderRadius: 10,
-          alignItems: "center",
-          alignContent: "center",
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 20,
-            fontWeight: "bold",
-            textAlign: "center",
-            paddingTop: hp(1),
-          }}
-        >
-          Donation Request's
-        </Text>
-      </View>
       <FlatList
         data={donations}
-        renderItem={(donation) => (
+        renderItem={donation => (
           <DonationCard
             key={donation.id}
             donation={donation.item}
@@ -205,7 +181,7 @@ function DonationRequestScreen() {
             donationGet={donationGet}
           />
         )}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={item => item.id.toString()}
         contentContainerStyle={styles.flatListContainer}
       />
     </View>
@@ -215,23 +191,38 @@ function DonationRequestScreen() {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    alignItems: "center",
-    backgroundColor: "#fff",
-    marginTop: hp(5),
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    top: hp(2),
   },
   card: {
     width: wp(80),
     padding: 15,
     marginVertical: 10,
-    backgroundColor: "#e0e0e0",
+    backgroundColor: '#00539C',
     borderRadius: 10,
-    alignItems: "center",
-    alignSelf: "center",
+    alignItems: 'center',
+    alignSelf: 'center',
+  },
+  headerText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    paddingTop: hp(1),
+    color: 'white',
   },
   flatListContainer: {
     flexGrow: 1,
     flex: 1,
     paddingBottom: hp(10),
+  },
+  headerTextContainer: {
+    backgroundColor: '#00539C',
+    width: wp(90),
+    height: hp(5),
+    borderRadius: 10,
+    alignItems: 'center',
+    alignContent: 'center',
   },
   paymentImage: {
     width: 200,
@@ -241,36 +232,35 @@ const styles = StyleSheet.create({
   },
   amount: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 5,
+    color: 'white',
   },
-  note: {
-    fontSize: 14,
-  },
+
   buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginTop: 10,
   },
   approveButton: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: '#4CAF50',
     padding: 10,
     borderRadius: 5,
     flex: 1,
     marginRight: 5,
-    alignItems: "center",
+    alignItems: 'center',
   },
   declineButton: {
-    backgroundColor: "#FF5733",
+    backgroundColor: '#FF5733',
     padding: 10,
     borderRadius: 5,
     flex: 1,
     marginLeft: 5,
-    alignItems: "center",
+    alignItems: 'center',
   },
   buttonText: {
-    color: "white",
-    fontWeight: "bold",
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 

@@ -1,54 +1,28 @@
-import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import MemberRequest from "./MemberRequest";
-import DonationRequestScreen from "./DonationRequest";
-import BorrowRequestScreen from "./BorrowRequest";
+/* eslint-disable prettier/prettier */
+import React from 'react';
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
+import {NavigationContainer} from '@react-navigation/native';
+import DonationRequestScreen from './DonationRequest';
+import BorrowRequestScreen from './BorrowRequest';
 
-const RequestTabs = ({ navigation }) => {
+const Tab = createMaterialTopTabNavigator();
+
+const RequestTabs = () => {
   return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("MemberRequest")}
-      >
-        <Text style={styles.buttonText}>Member Request</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("DonationRequestScreen")}
-      >
-        <Text style={styles.buttonText}>Donation Request</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("BorrowRequestScreen")}
-      >
-        <Text style={styles.buttonText}>Borrow Request</Text>
-      </TouchableOpacity>
-    </View>
+    <NavigationContainer independent={true}>
+      <Tab.Navigator
+        tabBarOptions={{
+          activeTintColor: 'white',
+          inactiveTintColor: 'gray',
+          style: {backgroundColor: '#00569C'},
+          labelStyle: {fontSize: 15, fontWeight: 'bold'},
+          indicatorStyle: {backgroundColor: 'white'},
+        }}>
+        <Tab.Screen name="Donation" component={DonationRequestScreen} />
+        <Tab.Screen name="Borrow" component={BorrowRequestScreen} />
+      </Tab.Navigator>
+    </NavigationContainer>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  button: {
-    backgroundColor: "#ab2787",
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    marginVertical: 10,
-    borderRadius: 10,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-});
 
 export default RequestTabs;

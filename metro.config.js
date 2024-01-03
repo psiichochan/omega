@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
 
 /**
@@ -8,4 +9,14 @@ const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
  */
 const config = {};
 
-module.exports = mergeConfig(getDefaultConfig(__dirname), config);
+module.exports = mergeConfig(getDefaultConfig(__dirname), {
+  resolver: {
+    sourceExts: ['jsx', 'js', 'ts', 'tsx', 'json'], // Add or adjust file extensions as needed
+  },
+  transformer: {
+    babelTransformerPath: require.resolve('react-native-svg-transformer'),
+  },
+  extraNodeModules: {
+    fs: require.resolve('react-native-fs'),
+  },
+});

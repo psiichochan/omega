@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */ /* eslint-disable prettier/prettier */
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -8,32 +9,149 @@ import {
   FlatList,
   Image,
   ToastAndroid,
-} from "react-native";
-import RNPickerSelect from "react-native-picker-select";
-import { Card } from "react-native-paper";
-import axios from "axios";
-import * as ImagePicker from "expo-image-picker";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+  ActivityIndicator,
+} from 'react-native';
+import RNPickerSelect from 'react-native-picker-select';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
+} from 'react-native-responsive-screen';
+import ImagePicker from 'react-native-image-crop-picker';
 
-const ExpensesScreen = ({ route }) => {
-  const isAdmin = route.params;
-  console.log("isAdmin: ", isAdmin);
-  const [selectedFilter, setSelectedFilter] = useState("all");
-  const [expenseAmount, setExpenseAmount] = useState("");
-  const [expensesNote, setExpensesNote] = useState("");
+function ExpenseCard({expense}) {
+  const [imageUrl, setImageUrl] = useState();
+  const [loading, setLoading] = useState(true);
+
+  async function GetMyProfileData() {
+    try {
+      const apiUrl = `http://3.6.89.38:9090/api/v1/fileAttachment/getFile?fileName=${expense.imageName}`;
+      const response = await axios.get(apiUrl);
+
+      if (response.status === 200) {
+        const base64Url = JSON.stringify(response.data.data.data);
+        const base64Icon = `data:image/png;base64,${base64Url}`;
+        setImageUrl(base64Icon);
+      } else {
+        // Handle error appropriately
+        ToastAndroid.showWithGravity(
+          'Failed to fetch image',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+      }
+    } catch (error) {
+      // Handle network or other errors
+      ToastAndroid.showWithGravity(
+        'Network error or something went wrong',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+    } finally {
+      // Update loading state
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    GetMyProfileData();
+  }, []);
+
+  const dateString = expense.dateOfExpense;
+  const [datePart] = dateString.split('T');
+
+  return (
+    <View style={styles.recordCard}>
+      <Text style={styles.recordAmount}>
+        Date: {expense.dateOfExpense === null ? '---' : datePart}
+      </Text>
+      <Text style={styles.recordAmount}>Amount : ${expense.amount}</Text>
+      {loading ? (
+        <Text>Loading image...</Text>
+      ) : (
+        <Image style={styles.paymentImage} source={{uri: imageUrl}} />
+      )}
+      <Text style={styles.recordAmount}>
+        Note: {expense.description === '' ? '---' : expense.description}
+      </Text>
+    </View>
+  );
+}
+
+const ExpensesScreen = ({route}) => {
+  const isAdmin = route.params.isAdmin.isAdmin;
+  console.log('isAdmin: ', isAdmin);
+  const [selectedFilter, setSelectedFilter] = useState('all');
+  const [expenseAmount, setExpenseAmount] = useState('');
+  const [expensesNote, setExpensesNote] = useState('');
   const [expensesRecords, setExpensesRecords] = useState([]);
-  const [totalExpenses, setTotalExpenses] = useState("");
-  const [qrImage, setQRImage] = useState(null);
-  const [imageName, setImageName] = useState("");
-  const [selectedImage, setSelectedImage] = useState(false); // Added state for image selection
-  const [imageStatus, setImageStatus] = useState(false);
+  const [totalExpenses, setTotalExpenses] = useState('');
+  const [qrImage, setQRImage] = useState('');
+  const [imageName, setImageName] = useState('');
+  const [selectedImage, setSelectedImage] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [totalDonation, setTotalDonation] = useState();
+  const [totalBorrow, setTotalBorrow] = useState();
+  const [availableExpense, setAvailableExpense] = useState(0);
+
   useEffect(() => {
     fetchExpensesList();
   }, [selectedFilter]);
+
+  const getTotalDonation = async () => {
+    try {
+      const apiUrl =
+        'http://3.6.89.38:9090/api/v1/donation/get/approved?filter=all';
+
+      const response = await axios.get(apiUrl);
+
+      if (response.status === 200) {
+        const totalAmount = response.data.totalAmount;
+        setTotalDonation(totalAmount);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getTotalBorrow = async () => {
+    try {
+      const apiUrl =
+        'http://3.6.89.38:9090/api/v1/borrowing/get/approved?filter=all';
+
+      const response = await axios.get(apiUrl);
+
+      if (response.status === 200) {
+        const totalAmount = response.data.totalAmount;
+        setTotalBorrow(totalAmount);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getTotalBorrow();
+    getTotalDonation();
+  }, []);
+
+  useEffect(() => {
+    calculateAvailableExpense();
+  }, [totalDonation, totalBorrow]);
+
+  const calculateAvailableExpense = () => {
+    if (
+      isAdmin &&
+      totalDonation !== undefined &&
+      totalBorrow !== undefined &&
+      totalExpenses !== undefined
+    ) {
+      console.log(totalBorrow, totalDonation, totalExpenses);
+      const adminAvailableExpense = totalDonation - totalBorrow - totalExpenses;
+      setAvailableExpense(adminAvailableExpense);
+    }
+  };
 
   const fetchExpensesList = async () => {
     try {
@@ -43,185 +161,170 @@ const ExpensesScreen = ({ route }) => {
       if (response.status === 200) {
         setTotalExpenses(response.data.totalAmount);
         setExpensesRecords(response.data.data.reverse());
-      } else {
-        console.log(
-          "Failed to fetch expenses list. Server response:",
-          response.status
-        );
+      } else if (response.status === 204) {
+        setTotalExpenses('');
+        setExpensesRecords([]);
       }
     } catch (error) {
-      console.error("Error fetching expenses list:", error);
+      console.error('Error fetching expenses list:', error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const extractImageName = (path) => {
-    const pathArray = path.split("/");
+  const extractImageName = path => {
+    const pathArray = path.split('/');
     const filename = pathArray[pathArray.length - 1];
     return filename;
   };
 
-  const handleReselectImage = () => {
-    setQRImage(null);
-    setSelectedImage(false); // Set selected image state to false
-  };
-
   const handleImageUpload = async () => {
     try {
-      const permissionResult =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-      if (permissionResult.granted === false) {
-        ToastAndroid.showWithGravity(
-          "Permission to access media library is required",
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER
-        );
-        return;
-      }
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 1,
+      const image = await ImagePicker.openPicker({
+        width: 300,
+        height: 300,
+        cropping: true,
       });
 
-      if (!result.cancelled) {
-        setQRImage(result.uri);
-        setImageStatus(true);
-        const name = extractImageName(result.uri);
+      if (image) {
+        const name = extractImageName(image.path);
+        const imagePath = image.path;
+        setQRImage(imagePath);
+
         setImageName(name);
-        setSelectedImage(true); // Set selected image state to true
+        setSelectedImage(true);
       }
     } catch (error) {
-      console.log("ImagePicker Error: ", error);
+      console.log('ImagePicker Error: ', error);
     }
   };
 
   async function ImageUpload() {
     try {
       const formData = new FormData();
-      formData.append("file", {
+      formData.append('file', {
         uri: qrImage,
         name: imageName,
-        fileName: "image",
-        type: "image/jpg",
+        fileName: 'image',
+        type: 'image/jpg',
       });
-      console.log("response image", imageName);
       const response = await axios.post(
-        "http://3.6.89.38:9090/api/v1/fileAttachment/file",
+        'http://3.6.89.38:9090/api/v1/fileAttachment/file',
         formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            'Content-Type': 'multipart/form-data',
           },
-        }
+        },
       );
-      // console.log("response image", response.status);
       if (response.status === 200) {
-        console.log("response image", response.data);
         ToastAndroid.showWithGravity(
-          "Receipt Code Uploaded successfully!",
+          'Receipt Code Uploaded successfully!',
           ToastAndroid.SHORT,
-          ToastAndroid.CENTER
+          ToastAndroid.CENTER,
         );
-        console.log("Receipt Uploaded successfully!");
+        console.log('Receipt Uploaded successfully!');
       } else {
         ToastAndroid.showWithGravity(
           `Error Uploading Receipt Code: ${response.status} ${response.statusText}`,
           ToastAndroid.SHORT,
-          ToastAndroid.CENTER
+          ToastAndroid.CENTER,
         );
         console.log(
-          "Error Uploading Receipt Code:",
+          'Error Uploading Receipt Code:',
           response.status,
-          response.statusText
+          response.statusText,
         );
       }
     } catch (error) {
       ToastAndroid.showWithGravity(
         `Error Uploading QR Code: ${error}`,
         ToastAndroid.SHORT,
-        ToastAndroid.CENTER
+        ToastAndroid.CENTER,
       );
-      console.error("Error during API request:", error);
-    } finally {
-      setLoadingImage(false);
+      console.error('Error during API request:', error);
     }
   }
 
   const makeExpense = async () => {
     try {
+      if (
+        availableExpense <= 0 ||
+        parseFloat(expenseAmount) > availableExpense
+      ) {
+        setQRImage('');
+        setExpenseAmount('');
+        setExpensesNote('');
+        setSelectedImage(false);
+        ToastAndroid.showWithGravity(
+          'You have insufficient available expense.',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+        return;
+      }
+
       if (!selectedImage) {
         ToastAndroid.showWithGravity(
-          "Please select an image",
+          'Please select an image',
           ToastAndroid.SHORT,
-          ToastAndroid.CENTER
+          ToastAndroid.CENTER,
         );
         return;
       }
 
       const amount = parseFloat(expenseAmount);
       if (isNaN(amount) || amount <= 0) {
-        console.error("Invalid expense amount");
+        ToastAndroid.showWithGravity(
+          'Invalid expense amount',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
         return;
       }
 
-      const userDetails = await AsyncStorage.getItem("UserDetails");
+      const userDetails = await AsyncStorage.getItem('UserDetails');
       const allDetails = JSON.parse(userDetails);
 
       const expenseData = {
         description: expensesNote,
         amount: expenseAmount,
-        category: "Food",
-        date_of_expense: new Date().toISOString(),
-        user_id: allDetails.id,
+        category: 'Food',
+        dateOfExpense: new Date().toISOString(),
+        userId: allDetails.id,
         imageName: imageName,
       };
 
-      const response = await fetch(
-        "http://3.6.89.38:9090/api/v1/expenses/addExpenses",
+      const response = await axios.post(
+        'http://3.6.89.38:9090/api/v1/expenses/addExpenses',
+        JSON.stringify(expenseData),
         {
-          method: "POST",
           headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
           },
-          body: JSON.stringify(expenseData),
-        }
+        },
       );
 
-      if (response.ok) {
-        ImageUpload();
-        setImageStatus(false);
-        setExpensesRecords((prevRecords) => [...prevRecords, expenseData]);
-        setExpenseAmount("");
-        setExpensesNote("");
+      if (response.status === 200) {
+        await ImageUpload();
+        setExpensesRecords(prevRecords => [...prevRecords, expenseData]);
+        setExpenseAmount('');
+        setExpensesNote('');
+        setQRImage('');
         fetchExpensesList();
+        setSelectedImage(false);
       } else {
-        console.log("Failed to add expense. Server response:", response.status);
+        console.log('Failed to add expense. Server response:', response.status);
       }
     } catch (error) {
-      console.error("Error making expense:", error);
+      console.error('Error making expense:', error);
     }
   };
 
-  const renderItem = ({ item }) => (
-    <Card style={styles.recordCard}>
-      <Card.Content>
-        <Text style={styles.recordAmount}>
-          {item.date === null ? "---" : new Date().toLocaleDateString()}
-        </Text>
-        <Text style={styles.recordAmount}>${item.amount}</Text>
-        <Text style={styles.recordAmount}>
-          {item.description === "" ? "---" : item.description}
-        </Text>
-      </Card.Content>
-    </Card>
-  );
-
   return (
     <View style={styles.container}>
+      <Text style={styles.expenses}>Expense's</Text>
       {isAdmin && (
         <View style={styles.section}>
           <TextInput
@@ -229,59 +332,64 @@ const ExpensesScreen = ({ route }) => {
             placeholder="Enter Expense amount"
             keyboardType="numeric"
             value={expenseAmount}
-            onChangeText={(text) =>
-              setExpenseAmount(text.replace(/[^0-9]/g, ""))
-            }
+            onChangeText={text => setExpenseAmount(text.replace(/[^0-9]/g, ''))}
           />
           <TextInput
             style={styles.input}
             placeholder="Enter Expense Note"
             value={expensesNote}
-            onChangeText={(text) =>
-              setExpensesNote(text.replace(/[^a-zA-Z0-9]/g, ""))
-            }
+            onChangeText={text => setExpensesNote(text)}
           />
-          {qrImage ? (
-            <View>
-              {imageStatus === true ? (
-                <Image source={{ uri: qrImage }} style={styles.qrImage} />
-              ) : (
-                <View></View>
-              )}
-
-              <Button title="Reselect Image" onPress={handleReselectImage} />
-            </View>
-          ) : (
-            <Button title="Select Receipt Image" onPress={handleImageUpload} />
+          {selectedImage && (
+            <Image source={{uri: qrImage}} style={styles.image1} />
           )}
+
           <Button
-            title="Add Expenses"
-            onPress={makeExpense}
-            disabled={expenseAmount === ""}
+            title="Select Receipt Image"
+            onPress={handleImageUpload}
+            color={'#00539C'}
           />
+
+          <View style={{marginTop: hp(2)}}>
+            <Button
+              title="Add Expenses"
+              onPress={makeExpense}
+              disabled={expenseAmount === ''}
+              color={'#00539C'}
+            />
+          </View>
         </View>
       )}
 
       <RNPickerSelect
-        placeholder={{ label: "Select Filter", value: null }}
-        onValueChange={(value) => setSelectedFilter(value)}
+        placeholder={{label: 'Select Filter', value: null}}
+        onValueChange={value => setSelectedFilter(value)}
         items={[
-          { label: "Day", value: "day" },
-          { label: "Week", value: "week" },
-          { label: "Month", value: "month" },
-          { label: "All", value: "all" },
+          {label: 'Day', value: 'day'},
+          {label: 'Week', value: 'week'},
+          {label: 'Month', value: 'month'},
+          {label: 'All', value: 'all'},
         ]}
       />
-      <Text style={{ fontSize: 15, fontWeight: "bold" }}>
-        Total Expenses: {totalExpenses}
-      </Text>
+      <Text style={styles.totalExpense}>Total Expenses: {totalExpenses}</Text>
+      {isAdmin && (
+        <Text style={styles.totalExpense}>
+          Available Expense: {availableExpense}
+        </Text>
+      )}
       <View style={styles.recordsSection}>
         <Text style={styles.sectionTitle}>Expense Records</Text>
-        <FlatList
-          data={expensesRecords}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => index.toString()}
-        />
+        {loading ? (
+          <ActivityIndicator size="large" color="blue" />
+        ) : (
+          <FlatList
+            data={expensesRecords}
+            renderItem={expense => (
+              <ExpenseCard key={expense.id} expense={expense.item} />
+            )}
+            keyExtractor={(item, index) => index.toString()}
+          />
+        )}
       </View>
     </View>
   );
@@ -291,21 +399,42 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: "white",
-    marginTop: hp(5),
+    backgroundColor: 'white',
   },
   section: {
     marginBottom: 20,
     top: 10,
   },
+  totalExpense: {fontSize: 15, fontWeight: 'bold', color: 'black'},
+  image1: {
+    width: 200,
+    height: 200,
+    resizeMode: 'contain',
+    marginBottom: 10,
+    alignContent: 'center',
+  },
+  image2: {
+    width: 200,
+    height: 200,
+    resizeMode: 'contain',
+    marginBottom: 10,
+    alignContent: 'center',
+  },
+  expenses: {
+    textAlign: 'center',
+    fontWeight: 'bold',
+    color: 'black',
+    fontSize: 20,
+  },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 10,
+    color: '#020000',
   },
   input: {
     height: 40,
-    borderColor: "gray",
+    borderColor: 'gray',
     borderWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,
@@ -314,17 +443,30 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: 20,
   },
+  paymentImage: {
+    width: wp(30),
+    height: hp(15),
+    borderRadius: 5,
+    marginBottom: 10,
+  },
   recordCard: {
-    marginVertical: 5,
+    width: wp(80),
+    padding: 15,
+    marginVertical: 10,
+    backgroundColor: '#00539C',
+    borderRadius: 10,
+    alignItems: 'center',
+    alignSelf: 'center',
   },
   recordAmount: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
+    color: 'white',
   },
   qrImage: {
     width: 200,
     height: 200,
-    resizeMode: "contain",
+    resizeMode: 'contain',
     marginBottom: 10,
   },
 });

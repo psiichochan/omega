@@ -1,5 +1,6 @@
-import axios from "axios";
-import React, { useState } from "react";
+/* eslint-disable prettier/prettier */
+import axios from 'axios';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -9,18 +10,18 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   ToastAndroid,
-} from "react-native";
+} from 'react-native';
 
-const SignupScreen = ({ navigation }) => {
-  const [name, setName] = useState("");
-  const [surname, setSurname] = useState("");
-  const [username, setUsername] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [email, setEmail] = useState("");
-  const [address, setAddress] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [role, setRole] = useState("member"); // Default role
+const SignupScreen = ({navigation}) => {
+  const [name, setName] = useState('');
+  const [surname, setSurname] = useState('');
+  const [username, setUsername] = useState('');
+  const [mobile, setMobile] = useState('');
+  const [email, setEmail] = useState('');
+  const [address, setAddress] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  // const [role, setRole] = useState('member'); // Default role
 
   const handleSignup = async () => {
     if (
@@ -34,9 +35,9 @@ const SignupScreen = ({ navigation }) => {
       !confirmPassword
     ) {
       ToastAndroid.showWithGravity(
-        "Please fill in all fields",
+        'Please fill in all fields',
         ToastAndroid.SHORT,
-        ToastAndroid.CENTER
+        ToastAndroid.CENTER,
       );
       return;
     }
@@ -44,9 +45,9 @@ const SignupScreen = ({ navigation }) => {
     const mobileRegex = /^[0-9]{10}$/;
     if (!mobileRegex.test(mobile)) {
       ToastAndroid.showWithGravity(
-        "Invalid mobile number format",
+        'Invalid mobile number format',
         ToastAndroid.SHORT,
-        ToastAndroid.CENTER
+        ToastAndroid.CENTER,
       );
       return;
     }
@@ -55,9 +56,9 @@ const SignupScreen = ({ navigation }) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       ToastAndroid.showWithGravity(
-        "Invalid email format",
+        'Invalid email format',
         ToastAndroid.SHORT,
-        ToastAndroid.CENTER
+        ToastAndroid.CENTER,
       );
       return;
     }
@@ -65,61 +66,64 @@ const SignupScreen = ({ navigation }) => {
     // Validate password and confirm password match
     if (password !== confirmPassword) {
       ToastAndroid.showWithGravity(
-        "Passwords do not match",
+        'Passwords do not match',
         ToastAndroid.SHORT,
-        ToastAndroid.CENTER
+        ToastAndroid.CENTER,
       );
       return;
     }
     try {
-      const apiUrl = "http://3.6.89.38:9090/api/v1/userController/signup";
+      const apiUrl = 'http://3.6.89.38:9090/api/v1/userController/signup';
 
       const userData = {
         firstName: name,
         lastName: surname,
         username: username,
-        mobileno: mobile,
+        mobileNo: mobile,
         email: email,
         address: address,
         password: password,
         confirmPassword: confirmPassword,
       };
 
-      console.log("body: ", userData);
+      console.log('body: ', userData);
 
       const response = await axios.post(apiUrl, JSON.stringify(userData), {
         headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
         },
       });
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         ToastAndroid.showWithGravity(
-          "SignUp Successfully. Please Wait While Admin Approves Your request",
+          'SignUp Successfully. Please Wait While Admin Approves Your request',
           ToastAndroid.SHORT,
-          ToastAndroid.CENTER
+          ToastAndroid.CENTER,
         );
-        navigation.navigate("Login");
+        console.log(response.data);
+        navigation.navigate('Login');
       } else {
         ToastAndroid.showWithGravity(
           response.data,
           ToastAndroid.SHORT,
-          ToastAndroid.CENTER
+          ToastAndroid.CENTER,
         );
+        console.log(response.status);
       }
     } catch (error) {
-      console.error("Error signing up:", error);
+      console.error('Error signing up:', error);
       // Handle error cases here
     }
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={{ flexGrow: 1 }}
-      keyboardShouldPersistTaps="handled"
-    >
-      <KeyboardAvoidingView behavior="padding" style={styles.container}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}>
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{flexGrow: 1}}>
         <View style={styles.container}>
           <Text style={styles.signupText}>Sign Up</Text>
 
@@ -128,7 +132,7 @@ const SignupScreen = ({ navigation }) => {
               style={styles.inputText}
               placeholder="First Name"
               placeholderTextColor="black"
-              onChangeText={(text) => setName(text)}
+              onChangeText={text => setName(text)}
             />
           </View>
 
@@ -137,7 +141,7 @@ const SignupScreen = ({ navigation }) => {
               style={styles.inputText}
               placeholder="Last Name"
               placeholderTextColor="black"
-              onChangeText={(text) => setSurname(text)}
+              onChangeText={text => setSurname(text)}
             />
           </View>
 
@@ -146,7 +150,7 @@ const SignupScreen = ({ navigation }) => {
               style={styles.inputText}
               placeholder="Username"
               placeholderTextColor="black"
-              onChangeText={(text) => setUsername(text)}
+              onChangeText={text => setUsername(text)}
             />
           </View>
 
@@ -155,7 +159,7 @@ const SignupScreen = ({ navigation }) => {
               style={styles.inputText}
               placeholder="Mobile No."
               placeholderTextColor="black"
-              onChangeText={(text) => setMobile(text)}
+              onChangeText={text => setMobile(text)}
               keyboardType="numeric"
             />
           </View>
@@ -165,7 +169,7 @@ const SignupScreen = ({ navigation }) => {
               style={styles.inputText}
               placeholder="Email ID"
               placeholderTextColor="black"
-              onChangeText={(text) => setEmail(text)}
+              onChangeText={text => setEmail(text)}
               keyboardType="email-address"
             />
           </View>
@@ -175,7 +179,7 @@ const SignupScreen = ({ navigation }) => {
               style={styles.inputText}
               placeholder="Address"
               placeholderTextColor="black"
-              onChangeText={(text) => setAddress(text)}
+              onChangeText={text => setAddress(text)}
               keyboardType="email-address"
             />
           </View>
@@ -186,7 +190,7 @@ const SignupScreen = ({ navigation }) => {
               placeholder="Password"
               placeholderTextColor="black"
               secureTextEntry={true}
-              onChangeText={(text) => setPassword(text)}
+              onChangeText={text => setPassword(text)}
               value={password}
             />
           </View>
@@ -197,29 +201,17 @@ const SignupScreen = ({ navigation }) => {
               placeholder="Confirm Password"
               placeholderTextColor="black"
               secureTextEntry={true}
-              onChangeText={(text) => setConfirmPassword(text)}
+              onChangeText={text => setConfirmPassword(text)}
               value={confirmPassword}
             />
           </View>
-
-          {/* Role Dropdown */}
-          {/* <View style={styles.inputView}>
-              <Picker
-                selectedValue={role}
-                onValueChange={(itemValue) => setRole(itemValue)}
-                style={styles.inputText}
-              >
-                <Picker.Item label="Admin" value="admin" />
-                <Picker.Item label="Member" value="member" />
-              </Picker>
-            </View> */}
 
           <TouchableOpacity style={styles.signupBtn} onPress={handleSignup}>
             <Text style={styles.signupBtnText}>SIGN UP</Text>
           </TouchableOpacity>
         </View>
-      </KeyboardAvoidingView>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -229,46 +221,46 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
   signupText: {
     fontSize: 30,
-    fontWeight: "bold",
-    color: "black",
+    fontWeight: 'bold',
+    color: 'black',
     marginBottom: 40,
-    textAlign: "center",
+    textAlign: 'center',
   },
   inputView: {
-    width: "80%",
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    width: '80%',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
     borderRadius: 25,
     height: 50,
     marginBottom: 20,
-    justifyContent: "center",
+    justifyContent: 'center',
     paddingHorizontal: 20,
-    alignSelf: "center",
-    borderColor: "black",
+    alignSelf: 'center',
+    borderColor: 'black',
     borderWidth: 1,
   },
   inputText: {
     height: 50,
-    color: "black",
+    color: 'black',
   },
   signupBtn: {
-    width: "80%",
-    backgroundColor: "#b981c7",
+    width: '80%',
+    backgroundColor: '#00539C',
     borderRadius: 25,
     height: 50,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 20,
     marginBottom: 10,
-    alignSelf: "center",
+    alignSelf: 'center',
   },
   signupBtnText: {
-    color: "black",
+    color: 'white',
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
 });
 

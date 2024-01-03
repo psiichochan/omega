@@ -1,63 +1,55 @@
-// borrowRequestScreen.js
+/* eslint-disable no-catch-shadow */ /* eslint-disable no-shadow */ /* eslint-disable prettier/prettier */
 
-import axios from "axios";
-import React, { useState, useEffect } from "react";
+import axios from 'axios';
+import React, {useState, useEffect} from 'react';
 import {
-  ScrollView,
   View,
   Text,
-  Image,
   StyleSheet,
   TouchableOpacity,
   FlatList,
   ToastAndroid,
-} from "react-native";
+} from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+} from 'react-native-responsive-screen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function BorrowCard({ borrow, onUpdate, GetBorrowUnApproved }) {
-  const handleUpdate = (status) => {
+function BorrowCard({borrow, onUpdate, GetBorrowUnApproved}) {
+  const handleUpdate = status => {
     onUpdate(
       borrow.borrowingId,
       status,
       borrow.borrowerName,
       borrow.amount,
       borrow.note,
-      borrow.borrowedDate
+      borrow.borrowedDate,
     );
     GetBorrowUnApproved();
-    console.log("this is borrow ID: ", borrow.id);
+    console.log('this is borrow ID: ', borrow.id);
   };
 
-  //   useEffect(() => {
-  //     GetMyProfileData();
-  //   }, []);
-
   const dateString = borrow.borrowedDate;
-  const [datePart, timePart] = dateString.split("T");
-
+  const [datePart] = dateString.split('T');
+  console.log('this is Borrow: ', borrow);
   return (
     <View style={styles.card}>
       <Text style={styles.amount}>{`Name: ${borrow.borrowerName}`}</Text>
       <Text style={styles.amount}>{`Date: ${datePart}`}</Text>
       <Text style={styles.amount}>{`Amount: ${borrow.amount}`}</Text>
-      <Text style={styles.note}>{`Note: ${borrow.note}`}</Text>
+      <Text style={styles.amount}>{`Note: ${borrow.note}`}</Text>
 
       {/* Approve and Decline Buttons */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.approveButton}
-          onPress={() => handleUpdate(true)}
-        >
+          onPress={() => handleUpdate(true)}>
           <Text style={styles.buttonText}>Approve</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.declineButton}
-          onPress={() => handleUpdate(false)}
-        >
+          onPress={() => handleUpdate(false)}>
           <Text style={styles.buttonText}>Decline</Text>
         </TouchableOpacity>
       </View>
@@ -67,28 +59,35 @@ function BorrowCard({ borrow, onUpdate, GetBorrowUnApproved }) {
 
 function BorrowRequestScreen() {
   const [borrow, setBorrow] = useState([]);
-  const [value, setValue] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   async function GetBorrowUnApproved() {
     try {
       const response = await axios.get(
-        `http://3.6.89.38:9090/api/v1/borrowing/get/unapproved`
+        'http://3.6.89.38:9090/api/v1/borrowing/get/unapproved',
       );
+
       if (response.status === 200) {
         const data = response.data;
-
         setBorrow(data);
-        GetBorrowUnApproved();
-      } else if (response.status === 404) {
-        // setValue(false);
+        setError(null);
+      } else if (response.status === 404 || response.status === 204) {
+        // Handle cases when no data is present
+        setBorrow([]);
+        setError('No data available.');
       }
-    } catch {
-      console.error("Error fetching data:", error);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setError('Error fetching data.');
+    } finally {
+      setLoading(false);
     }
   }
+
   useEffect(() => {
     GetBorrowUnApproved();
-  });
+  }, []); // Empty dependency array to ensure it runs only once on mount
 
   const handleUpdate = async (
     borrowId,
@@ -96,9 +95,9 @@ function BorrowRequestScreen() {
     username,
     amount,
     note,
-    date
+    date,
   ) => {
-    const userDetails = await AsyncStorage.getItem("UserDetails");
+    const userDetails = await AsyncStorage.getItem('UserDetails');
     const allDetails = JSON.parse(userDetails);
 
     try {
@@ -111,134 +110,138 @@ function BorrowRequestScreen() {
         date: date,
         status: status,
       };
-      console.log("request Body: ", requestBody);
+      console.log('request Body: ', requestBody);
       const response = await axios.put(
-        `http://3.6.89.38:9090/api/v1/borrowing/updateBorrowing`,
+        'http://3.6.89.38:9090/api/v1/borrowing/updateBorrowing',
         requestBody,
         {
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
-        }
+        },
       );
 
       if (response.status === 200) {
         ToastAndroid.showWithGravity(
-          "Borrowing Updated Successfully",
+          'Borrowing Updated Successfully',
           ToastAndroid.SHORT,
-          ToastAndroid.CENTER
+          ToastAndroid.CENTER,
         );
       }
 
-      setBorrow((prevBorrows) =>
-        prevBorrows.filter((borrow) => borrow.id !== borrowId)
+      setBorrow(prevBorrows =>
+        prevBorrows.filter(borrow => borrow.id !== borrowId),
       );
       GetBorrowUnApproved();
-      console.log(`borrow ${borrowId} ${status ? "approved" : "declined"}`);
+      console.log(`borrow ${borrowId} ${status ? 'approved' : 'declined'}`);
     } catch (error) {
-      console.error("Error updating borrow:", error);
+      console.error('Error updating borrow:', error);
     }
   };
 
   return (
     <View style={styles.container}>
-      <View
-        style={{
-          backgroundColor: "#b981c7",
-          width: wp(90),
-          height: hp(5),
-          borderRadius: 10,
-          alignItems: "center",
-          alignContent: "center",
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 20,
-            fontWeight: "bold",
-            textAlign: "center",
-            paddingTop: hp(1),
-          }}
-        >
-          Donation Request's
-        </Text>
-      </View>
-
-      <FlatList
-        data={borrow}
-        renderItem={(borrow) => (
-          <BorrowCard
-            key={borrow.borrowingId}
-            borrow={borrow.item}
-            onUpdate={handleUpdate}
-            GetBorrowUnApproved={GetBorrowUnApproved}
-          />
-        )}
-        keyExtractor={(item) => item.borrowingId.toString()}
-        contentContainerStyle={styles.flatListContainer}
-      />
+      {loading ? (
+        <Text style={styles.loadingText}>Loading...</Text>
+      ) : error ? (
+        <Text style={styles.errorText}>{error}</Text>
+      ) : borrow.length === 0 ? (
+        <Text style={styles.noDataText}>No data available.</Text>
+      ) : (
+        <FlatList
+          data={borrow}
+          renderItem={borrow1 => (
+            <BorrowCard
+              key={borrow1.borrowingId}
+              borrow={borrow1.item}
+              onUpdate={handleUpdate}
+              GetBorrowUnApproved={GetBorrowUnApproved}
+            />
+          )}
+          keyExtractor={item => item.borrowingId.toString()}
+          contentContainerStyle={styles.flatListContainer}
+        />
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    alignItems: "center",
-    backgroundColor: "#fff",
-    marginTop: hp(5),
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  header: {
+    backgroundColor: '#00539C',
+    width: wp(100),
+    height: hp(8),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headerText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'white',
   },
   card: {
-    width: wp(60),
+    width: wp(90),
     padding: 15,
     marginVertical: 10,
-    backgroundColor: "#e0e0e0",
+    backgroundColor: '#00539C',
     borderRadius: 10,
-    alignItems: "center",
-    alignSelf: "center",
+    alignItems: 'center',
+    alignSelf: 'center',
   },
   flatListContainer: {
     flexGrow: 1,
     paddingBottom: hp(10),
   },
-  paymentImage: {
-    width: 200,
-    height: 100,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
   amount: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 5,
-  },
-  note: {
-    fontSize: 14,
+    color: 'white',
   },
   buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginTop: 10,
   },
   approveButton: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: '#4CAF50',
     padding: 10,
     borderRadius: 5,
     flex: 1,
     marginRight: 5,
-    alignItems: "center",
+    alignItems: 'center',
   },
   declineButton: {
-    backgroundColor: "#FF5733",
+    backgroundColor: '#FF5733',
     padding: 10,
     borderRadius: 5,
     flex: 1,
     marginLeft: 5,
-    alignItems: "center",
+    alignItems: 'center',
   },
   buttonText: {
-    color: "white",
-    fontWeight: "bold",
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  loadingText: {
+    textAlign: 'center',
+    marginTop: hp(3),
+    fontSize: 18,
+  },
+  errorText: {
+    textAlign: 'center',
+    marginTop: hp(3),
+    fontSize: 18,
+    color: 'red',
+  },
+  noDataText: {
+    textAlign: 'center',
+    marginTop: hp(3),
+    fontSize: 18,
   },
 });
 
