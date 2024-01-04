@@ -21,13 +21,15 @@ import {ScrollView} from 'react-native-gesture-handler';
 
 function ProfileScreen({route}) {
   const navigation = useNavigation();
-  const {isAdmin} = route.params;
 
   const [userDetails, setUserDetails] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(null);
 
   const getUserDetails = async () => {
     const userDetails1 = await AsyncStorage.getItem('UserDetails');
     const allDetails = JSON.parse(userDetails1);
+    const hello = allDetails.email === 'rpdhole25@gmail.com' ? true : false;
+    setIsAdmin(hello);
     setUserDetails(allDetails);
   };
   useEffect(() => {
@@ -106,6 +108,8 @@ function ProfileScreen({route}) {
       {cancelable: true},
     );
   };
+
+  console.log('this is Admin: ', isAdmin);
   return (
     <ScrollView style={styles.mainContainer}>
       <View style={styles.container}>

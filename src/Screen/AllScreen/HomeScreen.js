@@ -91,14 +91,12 @@ const HomeScreen = ({route, navigation}) => {
     getApprovedDonations();
     getExpenses();
     getApprovedBorrow();
-  }, []);
+  });
 
   return (
     <View style={{flex: 1, backgroundColor: 'white'}}>
       <View
         style={{
-          // top: 5,
-          // left: 5,
           flexDirection: 'row',
           justifyContent: 'space-evenly',
           marginTop: hp(5),

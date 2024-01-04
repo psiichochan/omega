@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
   recordAmount: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#E2D1F9',
+    color: 'white',
   },
 });
 

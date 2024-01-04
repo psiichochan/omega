@@ -27,8 +27,8 @@ function BorrowCard({borrow, onUpdate, GetBorrowUnApproved}) {
       borrow.borrowedDate,
     );
     GetBorrowUnApproved();
-    console.log('this is borrow ID: ', borrow.id);
   };
+  console.log('this is borrow ID: ', borrow.borrowedDate);
 
   const dateString = borrow.borrowedDate;
   const [datePart] = dateString.split('T');
@@ -62,6 +62,10 @@ function BorrowRequestScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  useEffect(() => {
+    console.log('BorrowRequestScreen rendered');
+  }, []);
+
   async function GetBorrowUnApproved() {
     try {
       const response = await axios.get(
@@ -69,7 +73,7 @@ function BorrowRequestScreen() {
       );
 
       if (response.status === 200) {
-        const data = response.data;
+        const data = response.data.reverse();
         setBorrow(data);
         setError(null);
       } else if (response.status === 404 || response.status === 204) {
@@ -100,6 +104,8 @@ function BorrowRequestScreen() {
     const userDetails = await AsyncStorage.getItem('UserDetails');
     const allDetails = JSON.parse(userDetails);
 
+    console.log('this is status: ', status);
+
     try {
       const requestBody = {
         userId: allDetails.id,
@@ -107,7 +113,8 @@ function BorrowRequestScreen() {
         borrowerName: username,
         amount: amount,
         note: note,
-        date: date,
+        borrowedDate: date,
+        returnDate: '',
         status: status,
       };
       console.log('request Body: ', requestBody);

@@ -1,75 +1,88 @@
-/* eslint-disable prettier/prettier */
-// DonationRequestScreen.js
+/* eslint-disable no-catch-shadow */ /* eslint-disable no-shadow */ /* eslint-disable prettier/prettier */
 
 import axios from 'axios';
 import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   TouchableOpacity,
   FlatList,
   ToastAndroid,
+  Image,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function DonationCard({donation, onUpdate, donationGet}) {
+function BorrowCard({borrow, onUpdate, GetDonationUnApproved}) {
+  const [loading, setLoading] = useState(true);
+  const [imageUrl, setImageUrl] = useState();
+
   const handleUpdate = status => {
     onUpdate(
-      donation.id,
+      borrow.id,
       status,
-      donation.username,
-      donation.amount,
-      donation.note,
-      donation.screenshot,
-      donation.date,
+      borrow.username,
+      borrow.amount,
+      borrow.note,
+      borrow.date,
     );
-    donationGet();
-    console.log('this is donation ID: ', donation.id);
+    GetDonationUnApproved();
+    console.log('this is borrow ID: ', borrow.id);
   };
 
-  const [imageUrl, setImageUrl] = useState();
-  let base64Url;
-
   async function GetMyProfileData() {
-    const apiUrl = `http://3.6.89.38:9090/api/v1/fileAttachment/getFile?fileName=${donation.screenshot}`;
+    try {
+      const apiUrl = `http://3.6.89.38:9090/api/v1/fileAttachment/getFile?fileName=${borrow.screenshot}`;
+      const response = await axios.get(apiUrl);
 
-    const response = await axios.get(apiUrl);
-    let profileData;
-
-    if (response.status === 200) {
-      base64Url = JSON.stringify(response.data.data.data);
-      const base64Icon = `data:image/png;base64,${base64Url}`;
-      profileData = base64Icon;
-      setImageUrl(profileData);
-    } else {
+      if (response.status === 200) {
+        const base64Url = JSON.stringify(response.data.data.data);
+        const base64Icon = `data:image/png;base64,${base64Url}`;
+        setImageUrl(base64Icon);
+        console.log(imageUrl);
+      } else {
+        // Handle error appropriately
+        ToastAndroid.showWithGravity(
+          'Failed to fetch image',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+      }
+    } catch (error) {
+      // Handle network or other errors
       ToastAndroid.showWithGravity(
-        'Login Successfully',
+        'Network error or something went wrong',
         ToastAndroid.SHORT,
         ToastAndroid.CENTER,
       );
+    } finally {
+      // Update loading state
+      setLoading(false);
     }
-    return profileData;
   }
 
   useEffect(() => {
     GetMyProfileData();
-  });
+  }, []);
 
-  const dateString = donation.date;
+  const dateString = borrow.date;
   const [datePart] = dateString.split('T');
-
+  console.log('this is Borrow: ', borrow);
   return (
     <View style={styles.card}>
-      <Text style={styles.amount}>{`Name: ${donation.username}`}</Text>
+      <Text style={styles.amount}>{`Name: ${borrow.username}`}</Text>
       <Text style={styles.amount}>{`Date: ${datePart}`}</Text>
-      <Image style={styles.paymentImage} source={{uri: imageUrl}} />
-      <Text style={styles.amount}>{`Amount: ${donation.amount}`}</Text>
-      <Text style={styles.amount}>{`Note: ${donation.note}`}</Text>
+      <Text style={styles.amount}>{`Amount: ${borrow.amount}`}</Text>
+      {loading ? (
+        <Text>Loading image...</Text>
+      ) : (
+        <Image style={styles.paymentImage} source={{uri: imageUrl}} />
+      )}
+      <Text style={styles.amount}>{`Note: ${borrow.note}`}</Text>
 
       {/* Approve and Decline Buttons */}
       <View style={styles.buttonContainer}>
@@ -89,54 +102,48 @@ function DonationCard({donation, onUpdate, donationGet}) {
 }
 
 function DonationRequestScreen() {
-  const [donations, setDonations] = useState([]);
-  const [statusDonation, setStatusDonation] = useState(false);
+  const [donation, setDonation] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  async function donationGet() {
+  useEffect(() => {
+    console.log('BorrowRequestScreen rendered');
+  }, []);
+
+  async function GetDonationUnApproved() {
     try {
       const response = await axios.get(
         'http://3.6.89.38:9090/api/v1/donation/get/unapproved',
       );
-      if (response.status === 200) {
-        const data = response.data;
 
-        setDonations(data);
-      } else {
-        ToastAndroid.showWithGravity(
-          response.statusText,
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER,
-        );
+      if (response.status === 200) {
+        const data = response.data.reverse();
+        setDonation(data);
+        setError(null);
+      } else if (response.status === 404 || response.status === 204) {
+        // Handle cases when no data is present
+        setDonation([]);
+        setError('No data available.');
       }
-    } catch {
-      ToastAndroid.showWithGravity(
-        'Error Or No Request',
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER,
-      );
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setError('Error fetching data.');
+    } finally {
+      setLoading(false);
     }
   }
-  useEffect(() => {
-    donationGet();
-  });
 
-  const handleUpdate = async (
-    donationId,
-    status,
-    username,
-    amount,
-    note,
-    screenshot,
-    date,
-  ) => {
+  useEffect(() => {
+    GetDonationUnApproved();
+  }, []); // Empty dependency array to ensure it runs only once on mount
+
+  const handleUpdate = async (id, status, username, amount, note, date) => {
     try {
-      setStatusDonation(status);
       const requestBody = {
-        id: donationId,
+        id: id,
         username: username,
         amount: amount,
         note: note,
-        screenshot: screenshot,
         date: date,
         status: status,
       };
@@ -153,50 +160,67 @@ function DonationRequestScreen() {
 
       if (response.status === 200) {
         ToastAndroid.showWithGravity(
-          'Donation Approved Successfully',
+          'Borrowing Updated Successfully',
           ToastAndroid.SHORT,
           ToastAndroid.CENTER,
         );
       }
 
-      setDonations(prevDonations =>
-        prevDonations.filter(donation => donation.id !== donationId),
+      setDonation(prevDonation =>
+        prevDonation.filter(donation => donation.id !== id),
       );
-      donationGet();
-      console.log(`Donation ${donationId} ${status ? 'approved' : 'declined'}`);
+      GetDonationUnApproved();
     } catch (error) {
-      console.error('Error updating donation:', error);
+      console.error('Error updating borrow:', error);
     }
   };
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={donations}
-        renderItem={donation => (
-          <DonationCard
-            key={donation.id}
-            donation={donation.item}
-            onUpdate={handleUpdate}
-            donationGet={donationGet}
-          />
-        )}
-        keyExtractor={item => item.id.toString()}
-        contentContainerStyle={styles.flatListContainer}
-      />
+      {loading ? (
+        <Text style={styles.loadingText}>Loading...</Text>
+      ) : error ? (
+        <Text style={styles.errorText}>{error}</Text>
+      ) : donation.length === 0 ? (
+        <Text style={styles.noDataText}>No data available.</Text>
+      ) : (
+        <FlatList
+          data={donation}
+          renderItem={donation => (
+            <BorrowCard
+              key={donation.id}
+              borrow={donation.item}
+              onUpdate={handleUpdate}
+              GetDonationUnApproved={GetDonationUnApproved}
+            />
+          )}
+          keyExtractor={item => item.id.toString()}
+          contentContainerStyle={styles.flatListContainer}
+        />
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  header: {
+    backgroundColor: '#00539C',
+    width: wp(100),
+    height: hp(8),
+    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    top: hp(2),
+  },
+  headerText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'white',
   },
   card: {
-    width: wp(80),
+    width: wp(90),
     padding: 15,
     marginVertical: 10,
     backgroundColor: '#00539C',
@@ -204,29 +228,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'center',
   },
-  headerText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    paddingTop: hp(1),
-    color: 'white',
-  },
   flatListContainer: {
     flexGrow: 1,
-    flex: 1,
     paddingBottom: hp(10),
   },
-  headerTextContainer: {
-    backgroundColor: '#00539C',
-    width: wp(90),
-    height: hp(5),
-    borderRadius: 10,
-    alignItems: 'center',
-    alignContent: 'center',
-  },
   paymentImage: {
-    width: 200,
-    height: 100,
+    width: wp(45),
+    height: hp(15),
     borderRadius: 5,
     marginBottom: 10,
   },
@@ -236,7 +244,6 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     color: 'white',
   },
-
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -261,6 +268,22 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  loadingText: {
+    textAlign: 'center',
+    marginTop: hp(3),
+    fontSize: 18,
+  },
+  errorText: {
+    textAlign: 'center',
+    marginTop: hp(3),
+    fontSize: 18,
+    color: 'red',
+  },
+  noDataText: {
+    textAlign: 'center',
+    marginTop: hp(3),
+    fontSize: 18,
   },
 });
 

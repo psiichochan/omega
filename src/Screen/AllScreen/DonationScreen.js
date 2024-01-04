@@ -1,4 +1,4 @@
-/* eslint-disable prettier/prettier */
+/* eslint-disable react-hooks/exhaustive-deps */ /* eslint-disable prettier/prettier */
 import React, {useState, useEffect} from 'react';
 import {
   View,
@@ -7,7 +7,6 @@ import {
   Button,
   FlatList,
   StyleSheet,
-  SafeAreaView,
 } from 'react-native';
 import axios from 'axios';
 import RNPickerSelect from 'react-native-picker-select';
@@ -102,10 +101,10 @@ const DonationsScreen = ({navigation, username}) => {
         placeholder={{label: 'Select Filter', value: null, color: 'black'}}
         onValueChange={value => setSelectedValue(value)}
         items={[
-          {label: 'Today', value: 'day'},
-          {label: 'Weekly', value: 'week'},
-          {label: 'Monthly', value: 'month'},
-          {label: 'All', value: 'all'},
+          {label: 'Today', value: 'day', color: 'black'},
+          {label: 'Weekly', value: 'week', color: 'black'},
+          {label: 'Monthly', value: 'month', color: 'black'},
+          {label: 'All', value: 'all', color: 'black'},
         ]}
       />
       <View style={styles.recordsSection}>

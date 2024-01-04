@@ -1,16 +1,32 @@
 /* eslint-disable prettier/prettier */
 // TabNavigator.js
 
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import ProfileScreen from './ProfileScreen';
 import {Image, View} from 'react-native';
 import HomeScreen from './HomeScreen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = ({route}) => {
-  const {isAdmin, username} = route.params;
+  const [isAdmin, setIsAdmin] = useState(null);
+  const [username, setuserName] = useState(';');
+
+  const getUserDetails = async () => {
+    const allDetails = await AsyncStorage.getItem('UserDetails');
+    const email = JSON.parse(allDetails);
+    const hello = email.email === 'rpdhole25@gmail.com' ? true : false;
+    setIsAdmin(hello);
+    const hello2 = email.username;
+    setuserName(hello2);
+    console.log(hello);
+  };
+
+  useEffect(() => {
+    getUserDetails();
+  });
 
   console.log(route);
 

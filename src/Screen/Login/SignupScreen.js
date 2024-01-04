@@ -21,7 +21,6 @@ const SignupScreen = ({navigation}) => {
   const [address, setAddress] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  // const [role, setRole] = useState('member'); // Default role
 
   const handleSignup = async () => {
     if (
@@ -52,7 +51,6 @@ const SignupScreen = ({navigation}) => {
       return;
     }
 
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       ToastAndroid.showWithGravity(
@@ -63,7 +61,6 @@ const SignupScreen = ({navigation}) => {
       return;
     }
 
-    // Validate password and confirm password match
     if (password !== confirmPassword) {
       ToastAndroid.showWithGravity(
         'Passwords do not match',
@@ -72,6 +69,7 @@ const SignupScreen = ({navigation}) => {
       );
       return;
     }
+
     try {
       const apiUrl = 'http://3.6.89.38:9090/api/v1/userController/signup';
 
@@ -113,17 +111,14 @@ const SignupScreen = ({navigation}) => {
       }
     } catch (error) {
       console.error('Error signing up:', error);
-      // Handle error cases here
     }
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}>
+    <KeyboardAvoidingView style={styles.container}>
       <ScrollView
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{flexGrow: 1}}>
+        contentContainerStyle={styles.scrollView}>
         <View style={styles.container}>
           <Text style={styles.signupText}>Sign Up</Text>
 
@@ -216,9 +211,6 @@ const SignupScreen = ({navigation}) => {
 };
 
 const styles = StyleSheet.create({
-  gradientBackground: {
-    flex: 1,
-  },
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -242,6 +234,7 @@ const styles = StyleSheet.create({
     borderColor: 'black',
     borderWidth: 1,
   },
+  scrollView: {flexGrow: 1},
   inputText: {
     height: 50,
     color: 'black',
