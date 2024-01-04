@@ -97,7 +97,7 @@ function ProfileScreen({route}) {
           text: 'Yes, sure',
           onPress: async () => {
             try {
-              navigation.navigate('Auth'); // Navigate to 'Auth' after logout
+              navigation.navigate('Auth'); 
               await AsyncStorage.removeItem('UserDetails');
             } catch (error) {
               console.error('Error clearing UserDetails:', error);

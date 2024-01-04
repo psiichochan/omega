@@ -79,9 +79,7 @@ function ExpenseCard({expense}) {
   );
 }
 
-const ExpensesScreen = ({route}) => {
-  const isAdmin = route.params.isAdmin.isAdmin;
-  console.log('isAdmin: ', isAdmin);
+const ExpensesScreen = () => {
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [expenseAmount, setExpenseAmount] = useState('');
   const [expensesNote, setExpensesNote] = useState('');
@@ -94,6 +92,7 @@ const ExpensesScreen = ({route}) => {
   const [totalDonation, setTotalDonation] = useState();
   const [totalBorrow, setTotalBorrow] = useState();
   const [availableExpense, setAvailableExpense] = useState(0);
+  const [isAdmin, setIsAdmin] = useState(null);
 
   useEffect(() => {
     fetchExpensesList();
@@ -121,6 +120,11 @@ const ExpensesScreen = ({route}) => {
         'http://3.6.89.38:9090/api/v1/borrowing/get/approved?filter=all';
 
       const response = await axios.get(apiUrl);
+
+      const userDetails1 = await AsyncStorage.getItem('UserDetails');
+      const allDetails = JSON.parse(userDetails1);
+      const hello = allDetails.email === 'rpdhole25@gmail.com' ? true : false;
+      setIsAdmin(hello);
 
       if (response.status === 200) {
         const totalAmount = response.data.totalAmount;
@@ -438,7 +442,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,
-    color: 'white',
+    color: 'black',
   },
   recordsSection: {
     flex: 1,

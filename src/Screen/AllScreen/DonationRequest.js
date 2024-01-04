@@ -147,7 +147,6 @@ function DonationRequestScreen() {
         date: date,
         status: status,
       };
-      console.log('request Body: ', requestBody);
       const response = await axios.put(
         'http://3.6.89.38:9090/api/v1/donation/update',
         requestBody,
@@ -160,7 +159,7 @@ function DonationRequestScreen() {
 
       if (response.status === 200) {
         ToastAndroid.showWithGravity(
-          'Borrowing Updated Successfully',
+          'Donation Updated Successfully',
           ToastAndroid.SHORT,
           ToastAndroid.CENTER,
         );
