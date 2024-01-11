@@ -24,7 +24,7 @@ const LoginScreen = ({navigation}) => {
 
   useEffect(() => {
     if (loginSuccess) {
-      navigation.navigate('TabNavigator');
+      navigation.navigate('Parent');
 
       setLoginSuccess(false);
 
@@ -55,6 +55,7 @@ const LoginScreen = ({navigation}) => {
           ToastAndroid.SHORT,
           ToastAndroid.CENTER,
         );
+        console.log('date: ', response.data);
         const userDetails = JSON.stringify(response.data);
         await AsyncStorage.setItem('UserDetails', userDetails);
 
@@ -68,7 +69,7 @@ const LoginScreen = ({navigation}) => {
         setPassword('');
         setUsername('');
 
-        navigation.navigate('TabNavigator', {
+        navigation.navigate('Parent', {
           isAdmin: username === 'rpdhole25@gmail.com' ? true : false,
         });
       } else if (response.status === 401) {
@@ -120,12 +121,6 @@ const LoginScreen = ({navigation}) => {
         <TouchableOpacity style={styles.loginBtn} onPress={handleLogin}>
           <Text style={styles.loginText}>LOGIN</Text>
         </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.loginBtn, {bottom: hp(5)}]}
-          onPress={() => navigation.navigate('Signup')}>
-          <Text style={styles.signup}>Signup</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -149,7 +144,7 @@ const styles = StyleSheet.create({
     fontStyle: 'normal',
   },
   logo: {
-    fontSize: 30,
+    fontSize: hp(6),
     fontWeight: 'bold',
     color: 'black',
     marginBottom: 40,

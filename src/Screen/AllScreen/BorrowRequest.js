@@ -9,7 +9,10 @@ import {
   TouchableOpacity,
   FlatList,
   ToastAndroid,
+  Image,
 } from 'react-native';
+import ImagePicker from 'react-native-image-crop-picker';
+
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -25,21 +28,51 @@ function BorrowCard({borrow, onUpdate, GetBorrowUnApproved}) {
       borrow.amount,
       borrow.note,
       borrow.borrowedDate,
+      imageName2,
+      qrImage2,
     );
     GetBorrowUnApproved();
   };
+  const [qrImage2, setqrImage2] = useState(null);
+  const [imageName2, setimageName2] = useState('');
   console.log('this is borrow ID: ', borrow.borrowedDate);
-
+  const extractimageName2 = path => {
+    const pathArray = path.split('/');
+    const filename = pathArray[pathArray.length - 1];
+    return filename;
+  };
   const dateString = borrow.borrowedDate;
   const [datePart] = dateString.split('T');
-  console.log('this is Borrow: ', borrow);
+  const handleImageSelect2 = async () => {
+    try {
+      const image = await ImagePicker.openPicker({
+        width: 300,
+        height: 300,
+        cropping: true,
+      });
+
+      if (image) {
+        const name = extractimageName2(image.path);
+        const imagePath = image.path;
+        setqrImage2(imagePath);
+        setimageName2(name);
+      }
+    } catch (error) {
+      console.log('ImagePicker Error: ', error);
+    }
+  };
   return (
     <View style={styles.card}>
       <Text style={styles.amount}>{`Name: ${borrow.borrowerName}`}</Text>
       <Text style={styles.amount}>{`Date: ${datePart}`}</Text>
       <Text style={styles.amount}>{`Amount: ${borrow.amount}`}</Text>
       <Text style={styles.amount}>{`Note: ${borrow.note}`}</Text>
-
+      <Image source={{uri: qrImage2}} style={styles.qrImage1} />
+      <TouchableOpacity
+        style={styles.imageUploadButton}
+        onPress={handleImageSelect2}>
+        <Text style={styles.buttonText}>Upload Image</Text>
+      </TouchableOpacity>
       {/* Approve and Decline Buttons */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
@@ -100,6 +133,8 @@ function BorrowRequestScreen() {
     amount,
     note,
     date,
+    imageName,
+    qrImage,
   ) => {
     const userDetails = await AsyncStorage.getItem('UserDetails');
     const allDetails = JSON.parse(userDetails);
@@ -116,6 +151,7 @@ function BorrowRequestScreen() {
         borrowedDate: date,
         returnDate: '',
         status: status,
+        imageName: imageName,
       };
       console.log('request Body: ', requestBody);
       const response = await axios.put(
@@ -127,6 +163,44 @@ function BorrowRequestScreen() {
           },
         },
       );
+
+      const formData = new FormData();
+      formData.append('file', {
+        uri: qrImage,
+        name: imageName,
+        fileName: 'image',
+        type: 'image/jpg',
+      });
+      console.log('response image', imageName);
+      const response1 = await axios.post(
+        'http://3.6.89.38:9090/api/v1/fileAttachment/file',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      );
+
+      if (response1.status === 200) {
+        ToastAndroid.showWithGravity(
+          'Image Uploaded successfully!',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+        console.log('QR Code Uploaded successfully!');
+      } else {
+        ToastAndroid.showWithGravity(
+          `Error Uploading QR Code: ${response1.status} ${response1.statusText}`,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+        console.log(
+          'Error Uploading QR Code:',
+          response1.status,
+          response1.statusText,
+        );
+      }
 
       if (response.status === 200) {
         ToastAndroid.showWithGravity(
@@ -249,6 +323,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: hp(3),
     fontSize: 18,
+  },
+  qrImage1: {
+    width: 100,
+    height: 100,
+    resizeMode: 'contain',
+    marginBottom: 10,
   },
 });
 

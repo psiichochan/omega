@@ -7,6 +7,7 @@ import ProfileScreen from './ProfileScreen';
 import {Image, View} from 'react-native';
 import HomeScreen from './HomeScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import MyProfileScreen from './MyProfile';
 
 const Tab = createBottomTabNavigator();
 
@@ -54,7 +55,7 @@ const TabNavigator = ({route}) => {
 
         <Tab.Screen
           name="Profile"
-          component={ProfileScreen}
+          component={MyProfileScreen}
           initialParams={{isAdmin}}
           options={{headerShown: false}}
         />

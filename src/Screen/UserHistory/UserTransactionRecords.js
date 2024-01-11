@@ -12,7 +12,11 @@ function UserTransactionRecords({route}) {
   console.log('userId: ', userId, userName);
 
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      tabBarOptions={{
+        labelStyle: {fontSize: 14, fontWeight: 'bold', color: 'white'}, // Style for the tab labels
+        tabStyle: {backgroundColor: '#00539C'}, // Style for each tab
+      }}>
       <Tab.Screen name="Donation History" options={{title: 'Donation History'}}>
         {() => <DonationHistoryScreen userId={userId} userName={userName} />}
       </Tab.Screen>

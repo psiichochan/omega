@@ -50,10 +50,6 @@ function ProfileScreen({route}) {
     );
   };
 
-  const navigateToMemberRequest = () => {
-    navigation.navigate('MemberRequest');
-  };
-
   const navigateToNotificationScreen = () => {
     navigation.navigate('NotificationScreen');
   };
@@ -63,22 +59,22 @@ function ProfileScreen({route}) {
   };
 
   const navigateToAppSettings = () => {
-    navigation.navigate('BasicInfo');
+    navigation.navigate('AppSetting');
   };
 
   const navigateToReports = () => {
     navigation.navigate('Reports');
   };
 
-  const navigateToMemberDetails = () => {
-    navigation.navigate('MemberDetails');
-  };
-  const navigateToUserDetails = () => {
-    navigation.navigate('UserDetails');
+  const navigateToMyProfile = () => {
+    navigation.navigate('ProfileMy');
   };
 
-  const navigateToPaymentRequest = () => {
-    navigation.navigate('RequestTabs');
+  const navigateToMemberManagement = () => {
+    navigation.navigate('MemberManagement');
+  };
+  const navigateToPaymentManagement = () => {
+    navigation.navigate('PaymentManagement');
   };
 
   const navigateToSendMessageScreen = () => {
@@ -97,7 +93,7 @@ function ProfileScreen({route}) {
           text: 'Yes, sure',
           onPress: async () => {
             try {
-              navigation.navigate('Auth'); 
+              navigation.navigate('FirstScreen');
               await AsyncStorage.removeItem('UserDetails');
             } catch (error) {
               console.error('Error clearing UserDetails:', error);
@@ -109,7 +105,6 @@ function ProfileScreen({route}) {
     );
   };
 
-  console.log('this is Admin: ', isAdmin);
   return (
     <ScrollView style={styles.mainContainer}>
       <View style={styles.container}>
@@ -117,37 +112,30 @@ function ProfileScreen({route}) {
           style={styles.profileImage}
           source={require('../../../assets/AllImages/profilePic.jpg')}
         />
-
         {/* About Section */}
-        <TouchableOpacity style={styles.card} onPress={navigateToAbout}>
-          <Text style={styles.cardTitle}>About</Text>
+        <TouchableOpacity style={styles.card} onPress={navigateToMyProfile}>
+          <Text style={styles.cardTitle}>My Profile</Text>
         </TouchableOpacity>
         {isAdmin && (
           <TouchableOpacity
             style={styles.card}
-            onPress={navigateToPaymentMethods}>
-            <Text style={styles.cardTitle}>Payment Methods</Text>
+            onPress={navigateToMemberManagement}>
+            <Text style={styles.cardTitle}>Member Management</Text>
           </TouchableOpacity>
         )}
         {isAdmin && (
           <TouchableOpacity
             style={styles.card}
-            onPress={navigateToPaymentRequest}>
-            <Text style={styles.cardTitle}>Payment Request</Text>
+            onPress={navigateToPaymentManagement}>
+            <Text style={styles.cardTitle}>Payment Management</Text>
           </TouchableOpacity>
         )}
+
         {isAdmin && (
           <TouchableOpacity
             style={styles.card}
             onPress={navigateToSendMessageScreen}>
             <Text style={styles.cardTitle}>Send Notification</Text>
-          </TouchableOpacity>
-        )}
-        {isAdmin && (
-          <TouchableOpacity
-            style={styles.card}
-            onPress={navigateToMemberRequest}>
-            <Text style={styles.cardTitle}>Member Request</Text>
           </TouchableOpacity>
         )}
         {!isAdmin && (
@@ -158,28 +146,13 @@ function ProfileScreen({route}) {
           </TouchableOpacity>
         )}
         {isAdmin && (
-          <TouchableOpacity
-            style={styles.card}
-            onPress={navigateToMemberDetails}>
-            <Text style={styles.cardTitle}>Member's Details</Text>
-          </TouchableOpacity>
-        )}
-        {isAdmin && (
           <TouchableOpacity style={styles.card} onPress={navigateToReports}>
             <Text style={styles.cardTitle}>Reports</Text>
           </TouchableOpacity>
         )}
-
-        {isAdmin && (
-          <TouchableOpacity style={styles.card} onPress={navigateToUserDetails}>
-            <Text style={styles.cardTitle}>User's History</Text>
-          </TouchableOpacity>
-        )}
-
         <TouchableOpacity style={styles.card} onPress={navigateToAppSettings}>
           <Text style={styles.cardTitle}>App Setting</Text>
         </TouchableOpacity>
-
         <TouchableOpacity style={styles.card} onPress={handleLogout}>
           <Text style={styles.cardTitle}>Logout</Text>
         </TouchableOpacity>

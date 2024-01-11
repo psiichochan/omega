@@ -1,10 +1,11 @@
-/* eslint-disable prettier/prettier */
+/* eslint-disable react-hooks/exhaustive-deps */ /* eslint-disable prettier/prettier */
 import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import axios from 'axios';
 
 const BorrowHistoryScreen = ({userId, userName}) => {
   const [borrowHistory, setBorrowHistory] = useState([]);
+  const [totalBorrow, setTotalBorrow] = useState();
 
   const getUserActivities = async () => {
     try {
@@ -15,6 +16,7 @@ const BorrowHistoryScreen = ({userId, userName}) => {
       if (response.status === 200) {
         const borrowingHistory = response.data.Borrowing || [];
         setBorrowHistory(borrowingHistory);
+        setTotalBorrow(response.data['Total Borrowings']);
       }
     } catch (error) {
       console.log('Error fetching borrow history:', error);
@@ -30,6 +32,7 @@ const BorrowHistoryScreen = ({userId, userName}) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.totalBorrow}>Total Borrow:Rs. {totalBorrow} </Text>
       {borrowHistory.map(item => (
         <View key={item.borrowingId} style={styles.card}>
           <Text style={styles.title}>Amount: {item.amount}</Text>
@@ -48,6 +51,8 @@ const BorrowHistoryScreen = ({userId, userName}) => {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
+    flex: 1,
+    backgroundColor: 'white',
   },
   card: {
     backgroundColor: '#00539C',
@@ -56,6 +61,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     elevation: 4,
   },
+  totalBorrow: {fontSize: 15, fontWeight: 'bold', color: 'black'},
   text: {
     color: 'white',
     fontWeight: '500',

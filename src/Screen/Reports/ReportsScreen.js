@@ -1,7 +1,6 @@
 /* eslint-disable prettier/prettier */
 // Import necessary components from React and React Native
-import React, {useState, useEffect} from 'react';
-import {TabView, TabBar} from 'react-native-tab-view';
+import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -27,6 +26,12 @@ const ReportsScreen = ({navigation}) => {
         style={styles.button}
         onPress={() => navigation.navigate('ExpenseReportsScreen')}>
         <Text style={styles.buttonText}>Expense Reports</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate('UserDetailsList')}>
+        <Text style={styles.buttonText}>Member's</Text>
       </TouchableOpacity>
     </View>
   );
@@ -55,18 +60,17 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: 'white',
-    fontSize: 25,
+    fontSize: hp(2.2),
     fontWeight: 'bold',
     textAlign: 'center',
     alignSelf: 'center',
   },
   button: {
     backgroundColor: '#00539C',
-
     marginVertical: 10,
     borderRadius: 10,
     width: wp(80),
-    height: hp(10),
-    paddingTop: hp(3),
+    height: hp(5),
+    paddingTop: hp(1),
   },
 });

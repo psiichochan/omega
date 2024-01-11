@@ -8,6 +8,7 @@ import {
   ScrollView,
   Modal,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import axios from 'axios';
 import {
@@ -19,6 +20,7 @@ function MemberDetails() {
   const [userDetails, setuserDetails] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const getAllUserDetails = async () => {
     try {
@@ -27,18 +29,24 @@ function MemberDetails() {
 
       if (response.status === 200) {
         setuserDetails(response.data);
-        console.log(response.data[0]);
+        setLoading(false); // Set loading to false on successful API call
       } else {
         ToastAndroid.showWithGravity(
           "Error While Fetching User's List",
           ToastAndroid.BOTTOM,
+          ToastAndroid.LONG,
         );
       }
     } catch (error) {
       console.log('Error while Fetching UserDetails: ', error);
+      ToastAndroid.showWithGravity(
+        "Error While Fetching User's List",
+        ToastAndroid.BOTTOM,
+        ToastAndroid.LONG,
+      );
+      setLoading(false); // Set loading to false on API call failure
     }
   };
-
   const getStatusColor = status => {
     return status ? 'green' : 'red';
   };
@@ -54,75 +62,72 @@ function MemberDetails() {
 
   return (
     <View>
-      <View style={styles.headerContainer}>
-        <Text style={styles.headerText}>Member Detail's</Text>
-      </View>
-      <ScrollView contentContainerStyle={styles.container}>
-        {userDetails.map(user => (
-          <TouchableOpacity
-            key={user.id}
-            style={styles.card}
-            onPress={() => showUserDetails(user)}>
-            <Text style={styles.title}>
-              {user.firstName} {user.lastName}
-            </Text>
-            <Text
-              style={[styles.text2, {color: getStatusColor(user.approved)}]}>
-              Status: {user.approved ? 'Approved' : 'Not Approved'}
-            </Text>
-          </TouchableOpacity>
-        ))}
+      {loading ? ( // Display loader if loading is true
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <ScrollView contentContainerStyle={styles.container}>
+          {userDetails.map(user => (
+            <TouchableOpacity
+              key={user.id}
+              style={styles.card}
+              onPress={() => showUserDetails(user)}>
+              <Text style={styles.title}>
+                {user.firstName} {user.lastName}
+              </Text>
+              <Text
+                style={[styles.text2, {color: getStatusColor(user.approved)}]}>
+                Status: {user.approved ? 'Approved' : 'Not Approved'}
+              </Text>
+            </TouchableOpacity>
+          ))}
 
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}>
-          <View style={styles.modalContainer}>
-            <View
-              style={[
-                styles.modalContent,
-                // {backgroundColor: getStatusColor(selectedUser?.approved)},
-              ]}>
-              {selectedUser && (
-                <React.Fragment>
-                  <Text style={styles.modalTitle}>
-                    {selectedUser.firstName} {selectedUser.lastName}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.modalText2,
-                      {color: getStatusColor(selectedUser.approved)},
-                    ]}>
-                    Status:{' '}
-                    {selectedUser.approved
-                      ? 'Approved'
-                      : 'Not Approved Or Rejected'}
-                  </Text>
-                  <Text style={styles.modalText2}>
-                    Username: {selectedUser.username}
-                  </Text>
-                  <Text style={styles.modalText2}>
-                    Email: {selectedUser.email}
-                  </Text>
-                  <Text style={styles.modalText2}>
-                    Mobile No: {selectedUser.mobileNo || 'N/A'}
-                  </Text>
-                  <Text style={styles.modalText2}>
-                    Address: {selectedUser.address || 'N/A'}
-                  </Text>
-                  {/* Add other fields as needed */}
-                </React.Fragment>
-              )}
-              <TouchableOpacity
-                onPress={() => setModalVisible(false)}
-                style={styles.modalCloseButton}>
-                <Text style={styles.modalButtonText}>Close</Text>
-              </TouchableOpacity>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => setModalVisible(false)}>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                {selectedUser && (
+                  <React.Fragment>
+                    <Text style={styles.modalTitle}>
+                      {selectedUser.firstName} {selectedUser.lastName}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.modalText2,
+                        {color: getStatusColor(selectedUser.approved)},
+                      ]}>
+                      Status:{' '}
+                      {selectedUser.approved
+                        ? 'Approved'
+                        : 'Not Approved Or Rejected'}
+                    </Text>
+                    <Text style={styles.modalText2}>
+                      Username: {selectedUser.username}
+                    </Text>
+                    <Text style={styles.modalText2}>
+                      Email: {selectedUser.email}
+                    </Text>
+                    <Text style={styles.modalText2}>
+                      Mobile No: {selectedUser.mobileNo || 'N/A'}
+                    </Text>
+                    <Text style={styles.modalText2}>
+                      Address: {selectedUser.address || 'N/A'}
+                    </Text>
+                    {/* Add other fields as needed */}
+                  </React.Fragment>
+                )}
+                <TouchableOpacity
+                  onPress={() => setModalVisible(false)}
+                  style={styles.modalCloseButton}>
+                  <Text style={styles.modalButtonText}>Close</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        </Modal>
-      </ScrollView>
+          </Modal>
+        </ScrollView>
+      )}
     </View>
   );
 }

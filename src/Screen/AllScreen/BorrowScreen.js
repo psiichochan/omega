@@ -9,6 +9,7 @@ import {
   FlatList,
   ToastAndroid,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,6 +19,61 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+
+function BorrowCard({item}) {
+  const [loading, setLoading] = useState(true);
+  const [imageUrl, setImageUrl] = useState();
+  async function GetMyProfileData() {
+    try {
+      const apiUrl = `http://3.6.89.38:9090/api/v1/fileAttachment/getFile?fileName=${item.item.imageName}`;
+      console.log(apiUrl);
+      const response = await axios.get(apiUrl);
+
+      if (response.status === 200) {
+        const base64Url = JSON.stringify(response.data.data.data);
+        const base64Icon = `data:image/png;base64,${base64Url}`;
+        setImageUrl(base64Icon);
+        console.log(imageUrl);
+      } else {
+        // Handle error appropriately
+        ToastAndroid.showWithGravity(
+          'Failed to fetch image',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+      }
+    } catch (error) {
+      // Handle network or other errors
+      ToastAndroid.showWithGravity(
+        'Network error or something went wrong',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+    } finally {
+      // Update loading state
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    GetMyProfileData();
+  }, []);
+
+  return (
+    <Card style={styles.recordCard}>
+      <Card.Content>
+        <Text style={styles.recordAmount}>Name: {item.item.borrowerName}</Text>
+        <Text style={styles.recordAmount}>Amount: {item.item.amount}</Text>
+        <Text style={styles.recordAmount}>Description: {item.item.note}</Text>
+        {loading ? (
+          <Text>Loading image...</Text>
+        ) : (
+          <Image style={styles.paymentImage} source={{uri: imageUrl}} />
+        )}
+      </Card.Content>
+    </Card>
+  );
+}
 
 const BorrowScreen = () => {
   const [borrowAmount, setBorrowAmount] = useState('');
@@ -108,16 +164,6 @@ const BorrowScreen = () => {
     getBorrowApprovedList();
   }, [selectedFilter]);
 
-  const renderItem = ({item}) => (
-    <Card style={styles.recordCard}>
-      <Card.Content>
-        <Text style={styles.recordAmount}>Name: {item.borrowerName}</Text>
-        <Text style={styles.recordAmount}>Amount: ${item.amount}</Text>
-        <Text style={styles.recordAmount}>Description: {item.note}</Text>
-      </Card.Content>
-    </Card>
-  );
-
   return (
     <View style={styles.container}>
       <View style={styles.section}>
@@ -164,7 +210,7 @@ const BorrowScreen = () => {
         ) : (
           <FlatList
             data={borrowApprovedRecords}
-            renderItem={renderItem}
+            renderItem={borrow => <BorrowCard item={borrow} />}
             keyExtractor={(item, index) => index.toString()}
           />
         )}
@@ -201,6 +247,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     borderRadius: 10,
+  },
+  paymentImage: {
+    width: wp(45),
+    height: hp(15),
+    borderRadius: 5,
+    marginBottom: 10,
   },
   recordsSection: {
     flex: 1,

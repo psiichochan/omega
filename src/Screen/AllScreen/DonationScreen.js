@@ -46,7 +46,7 @@ const DonationsScreen = ({navigation, username}) => {
       setDonationAmount('');
       setDonationNote('');
 
-      navigation.navigate('Payment', {
+      navigation.navigate('PaymentQRScreen', {
         donationAmount: amount,
         date: new Date(),
         donationNote: donationNote,

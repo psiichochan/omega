@@ -1,48 +1,66 @@
 /* eslint-disable prettier/prettier */
-import React from 'react';
-import {View, Button, StyleSheet} from 'react-native';
+// Import necessary components from React and React Native
+import React, {useState, useEffect} from 'react';
+import {TabView, TabBar} from 'react-native-tab-view';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
-const AppSetting = ({navigation}) => {
-  const handleBasicInfoPress = () => {
-    navigation.navigate('BasicInfo');
-  };
-
-  const handleBankDetailsPress = () => {
-    navigation.navigate('PaymentMethods');
-  };
-
+const ReportsScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
-      <View style={styles.buttonContainer}>
-        <Button
-          title="Basic Info"
-          onPress={handleBasicInfoPress}
-          style={styles.button}
-        />
-        <Button
-          title="Bank Details"
-          onPress={handleBankDetailsPress}
-          style={styles.button}
-        />
-      </View>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate('BasicInfo')}>
+        <Text style={styles.buttonText}>Basic Info</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate('PaymentMethods')}>
+        <Text style={styles.buttonText}>Payment Details</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
+export default ReportsScreen;
+
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 16,
+    flex: 1,
+    backgroundColor: 'white',
+    alignItems: 'center',
   },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  card: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 25,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    alignSelf: 'center',
   },
   button: {
-    flex: 1,
-    marginHorizontal: 10,
+    backgroundColor: '#00539C',
+
+    marginVertical: 10,
+    borderRadius: 10,
+    width: wp(80),
+    height: hp(6),
+    paddingTop: hp(1),
   },
 });
-
-export default AppSetting;

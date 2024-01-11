@@ -9,6 +9,7 @@ import {
   ScrollView,
   TouchableOpacity,
   ToastAndroid,
+  ActivityIndicator,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -50,26 +51,39 @@ function Card({profile, onApprove, onDecline}) {
 function MemberRequest() {
   const [profiles, setProfiles] = useState([]);
   const [contain, setContain] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const getUnapprovedUser = async () => {
-    const apiUrl =
-      'http://3.6.89.38:9090/api/v1/userController/getAllUser/unapproved';
+    try {
+      const apiUrl =
+        'http://3.6.89.38:9090/api/v1/userController/getAllUser/unapproved';
 
-    const response = await axios.get(apiUrl);
+      const response = await axios.get(apiUrl);
 
-    if (response.status === 200) {
-      setProfiles(response.data);
-    } else if (response.status === 204) {
-      setContain(true);
-    } else {
+      if (response.status === 200) {
+        setProfiles(response.data);
+        setContain(false);
+      } else if (response.status === 204) {
+        setProfiles([]);
+        setContain(true);
+      } else {
+        ToastAndroid.showWithGravity(
+          'Error While Calling UnApproved User List',
+          ToastAndroid.LONG,
+          ToastAndroid.CENTER,
+        );
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
       ToastAndroid.showWithGravity(
         'Error While Calling UnApproved User List',
-        ToastAndroid.SHORT,
+        ToastAndroid.LONG,
         ToastAndroid.CENTER,
       );
+    } finally {
+      setLoading(false); // Set loading to false regardless of success or failure
     }
   };
-
   useEffect(() => {
     getUnapprovedUser();
   }, []);
@@ -96,7 +110,7 @@ function MemberRequest() {
         );
         ToastAndroid.showWithGravity(
           'Member Request Approved Successfully',
-          ToastAndroid.SHORT,
+          ToastAndroid.LONG,
           ToastAndroid.CENTER,
         );
       } else {
@@ -129,7 +143,7 @@ function MemberRequest() {
         );
         ToastAndroid.showWithGravity(
           'Member Request Declined Successfully',
-          ToastAndroid.SHORT,
+          ToastAndroid.LONG,
           ToastAndroid.CENTER,
         );
       } else {
@@ -142,24 +156,26 @@ function MemberRequest() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.memberRequestContainer}>
-        <Text style={styles.memberRequestName}>Member Request's</Text>
-      </View>
-
-      {profiles.map(profile => (
-        <Card
-          key={profile.id}
-          profile={profile}
-          onApprove={handleApprove}
-          onDecline={handleDecline}
-        />
-      ))}
-      {contain === true ? (
-        <View>
-          <Text style={styles.containTexxt}>No data present</Text>
-        </View>
+      {loading ? ( // Display loader if loading is true
+        <ActivityIndicator size="large" color="#0000ff" />
       ) : (
-        <View />
+        <React.Fragment>
+          {profiles.map(profile => (
+            <Card
+              key={profile.id}
+              profile={profile}
+              onApprove={handleApprove}
+              onDecline={handleDecline}
+            />
+          ))}
+          {contain === true ? (
+            <View>
+              <Text style={styles.containTexxt}>No data present</Text>
+            </View>
+          ) : (
+            <View />
+          )}
+        </React.Fragment>
       )}
     </ScrollView>
   );
@@ -171,7 +187,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
   },
-  containTexxt: {fontSize: 30, fontWeight: 'bold', color: 'black'},
+  containTexxt: {fontSize: 20, fontWeight: 'bold', color: 'black', top: hp(10)},
   card: {
     width: '80%',
     padding: 15,

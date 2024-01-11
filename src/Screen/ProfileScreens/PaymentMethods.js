@@ -104,7 +104,6 @@ const PaymentMethods = () => {
       );
       // console.log("response image", response.status);
       if (response.status === 200) {
-        console.log('response image', response.data);
         ToastAndroid.showWithGravity(
           'QR Code Uploaded successfully!',
           ToastAndroid.SHORT,

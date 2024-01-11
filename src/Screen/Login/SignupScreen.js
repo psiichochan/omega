@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   ToastAndroid,
 } from 'react-native';
+import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 
 const SignupScreen = ({navigation}) => {
   const [name, setName] = useState('');
@@ -21,6 +22,17 @@ const SignupScreen = ({navigation}) => {
   const [address, setAddress] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  const handleMobileChange = text => {
+    // Remove non-numeric characters from the input
+    const numericValue = text.replace(/[^0-9]/g, '');
+
+    // Limit the length to 10 digits
+    const limitedValue = numericValue.slice(0, 10);
+
+    // Update the state
+    setMobile(limitedValue);
+  };
 
   const handleSignup = async () => {
     if (
@@ -154,7 +166,8 @@ const SignupScreen = ({navigation}) => {
               style={styles.inputText}
               placeholder="Mobile No."
               placeholderTextColor="black"
-              onChangeText={text => setMobile(text)}
+              onChangeText={handleMobileChange}
+              value={mobile}
               keyboardType="numeric"
             />
           </View>
@@ -216,7 +229,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   signupText: {
-    fontSize: 30,
+    fontSize: hp(6),
     fontWeight: 'bold',
     color: 'black',
     marginBottom: 40,

@@ -16,7 +16,4 @@ module.exports = mergeConfig(getDefaultConfig(__dirname), {
   transformer: {
     babelTransformerPath: require.resolve('react-native-svg-transformer'),
   },
-  extraNodeModules: {
-    fs: require.resolve('react-native-fs'),
-  },
 });

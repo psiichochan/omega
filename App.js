@@ -1,8 +1,6 @@
 /* eslint-disable prettier/prettier */
-import {NavigationContainer, useNavigation} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import React, {useEffect, useState} from 'react';
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoginScreen from './src/Screen/Login/LoginScreen';
 import SignupScreen from './src/Screen/Login/SignupScreen';
@@ -27,25 +25,14 @@ import UserTransactionRecords from './src/Screen/UserHistory/UserTransactionReco
 import BasicInfo from './src/Screen/AppSettings/BasicInfo';
 import SendMessageScreen from './src/Screen/Notification/SendMessageScreen';
 import NotificationScreen from './src/Screen/Notification/NotificationScreen';
+import FirstScreen from './src/Screen/AllScreen/FirstScreen';
+import MyProfileScreen from './src/Screen/AllScreen/MyProfile';
+import MemberManagement from './src/Screen/AllScreen/MemberManagement';
+import PaymentManagement from './src/Screen/AllScreen/PaymentManagement';
+import UserDetailsList from './src/Screen/Reports/UserDetailsList';
+import AppNavigator from './src/AppNavigator';
 
 const Stack = createStackNavigator();
-
-const AuthStack = ({navigation}) => {
-  return (
-    <Stack.Navigator initialRouteName="Login">
-      <Stack.Screen
-        name="Login"
-        component={LoginScreen}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="Signup"
-        component={SignupScreen}
-        options={{headerShown: false}}
-      />
-    </Stack.Navigator>
-  );
-};
 
 const App = () => {
   const [userLoggedIn, setUserLoggedIn] = useState(null);
@@ -69,123 +56,10 @@ const App = () => {
   }, []);
 
   if (userLoggedIn === null) {
-    // Loading state, you might want to show a loading spinner
     return null;
   }
 
-  return (
-    <NavigationContainer>
-      {userLoggedIn ? (
-        <Stack.Navigator screenOptions={{headerMode: 'none'}}>
-          <Stack.Screen name="TabNavigator" component={TabNavigator} />
-          <Stack.Screen name="Auth" component={AuthStack} />
-          <Stack.Screen
-            name="Login"
-            component={LoginScreen}
-            options={{headerShown: false}}
-          />
-          <Stack.Screen name="Payment" component={PaymentQRScreen} />
-          <Stack.Screen name="MemberRequest" component={MemberRequest} />
-          <Stack.Screen name="RequestTabs" component={RequestTabs} />
-          <Stack.Screen name="AppSetting" component={AppSetting} />
-          <Stack.Screen
-            name="DonationRequestScreen"
-            component={DonationRequestScreen}
-          />
-          <Stack.Screen
-            name="BorrowRequestScreen"
-            component={BorrowRequestScreen}
-          />
-          <Stack.Screen name="PaymentMethods" component={PaymentMethods} />
-          <Stack.Screen name="Reports" component={ReportsScreen} />
-          <Stack.Screen name="DonationsScreen" component={DonationsScreen} />
-          <Stack.Screen name="ExpenseScreen" component={ExpensesScreen} />
-          <Stack.Screen name="BorrowScreen" component={BorrowScreen} />
-          <Stack.Screen name="MemberDetails" component={MemberDetails} />
-          <Stack.Screen
-            name="BorrowScreenReports"
-            component={BorrowScreenReports}
-          />
-          <Stack.Screen
-            name="DonationReportsScreen"
-            component={DonationReportsScreen}
-          />
-          <Stack.Screen
-            name="ExpenseReportsScreen"
-            component={ExpenseReportsScreen}
-          />
-          <Stack.Screen name="UserDetails" component={UserDetails} />
-          <Stack.Screen
-            name="UserTransactionRecords"
-            component={UserTransactionRecords}
-          />
-          <Stack.Screen name="BasicInfo" component={BasicInfo} />
-          <Stack.Screen
-            name="SendMessageScreen"
-            component={SendMessageScreen}
-          />
-          <Stack.Screen
-            name="NotificationScreen"
-            component={NotificationScreen}
-          />
-        </Stack.Navigator>
-      ) : (
-        <Stack.Navigator screenOptions={{headerMode: 'none'}}>
-          <Stack.Screen name="Auth" component={AuthStack} />
-          <Stack.Screen
-            name="Login"
-            component={LoginScreen}
-            options={{headerShown: false}}
-          />
-          <Stack.Screen name="TabNavigator" component={TabNavigator} />
-          <Stack.Screen name="Payment" component={PaymentQRScreen} />
-          <Stack.Screen name="MemberRequest" component={MemberRequest} />
-          <Stack.Screen name="RequestTabs" component={RequestTabs} />
-          <Stack.Screen name="AppSetting" component={AppSetting} />
-          <Stack.Screen
-            name="DonationRequestScreen"
-            component={DonationRequestScreen}
-          />
-          <Stack.Screen
-            name="BorrowRequestScreen"
-            component={BorrowRequestScreen}
-          />
-          <Stack.Screen name="PaymentMethods" component={PaymentMethods} />
-          <Stack.Screen name="Reports" component={ReportsScreen} />
-          <Stack.Screen name="DonationsScreen" component={DonationsScreen} />
-          <Stack.Screen name="ExpenseScreen" component={ExpensesScreen} />
-          <Stack.Screen name="BorrowScreen" component={BorrowScreen} />
-          <Stack.Screen name="MemberDetails" component={MemberDetails} />
-          <Stack.Screen
-            name="BorrowScreenReports"
-            component={BorrowScreenReports}
-          />
-          <Stack.Screen
-            name="DonationReportsScreen"
-            component={DonationReportsScreen}
-          />
-          <Stack.Screen
-            name="ExpenseReportsScreen"
-            component={ExpenseReportsScreen}
-          />
-          <Stack.Screen name="UserDetails" component={UserDetails} />
-          <Stack.Screen
-            name="UserTransactionRecords"
-            component={UserTransactionRecords}
-          />
-          <Stack.Screen name="BasicInfo" component={BasicInfo} />
-          <Stack.Screen
-            name="SendMessageScreen"
-            component={SendMessageScreen}
-          />
-          <Stack.Screen
-            name="NotificationScreen"
-            component={NotificationScreen}
-          />
-        </Stack.Navigator>
-      )}
-    </NavigationContainer>
-  );
+  return <AppNavigator />;
 };
 
 export default App;

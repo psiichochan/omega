@@ -1,4 +1,4 @@
-/* eslint-disable prettier/prettier */
+/* eslint-disable react-hooks/exhaustive-deps */ /* eslint-disable prettier/prettier */
 import React, {useEffect, useState} from 'react';
 import {View, Text, FlatList, StyleSheet, ToastAndroid} from 'react-native';
 import axios from 'axios';
@@ -6,15 +6,16 @@ import axios from 'axios';
 function DonationHistoryScreen({userId, userName}) {
   console.log('routes: ', userId, userName);
   const [donationHistory, setDonationHistory] = useState([]);
+  const [totalDonations, setTotalDonations] = useState();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const apiUrl = `http://3.6.89.38:9090/api/v1/userController/user/activities?username=${userName}&id=${userId}&filter=month`;
         const response = await axios.get(apiUrl);
-        console.log(response.data);
         if (response.status === 200) {
           setDonationHistory(response.data.Donation);
+          setTotalDonations(response.data['Total Donations']);
         } else if (response.status === 204) {
           // If response status is 204, show ToastAndroid message
           ToastAndroid.showWithGravity(
@@ -33,6 +34,9 @@ function DonationHistoryScreen({userId, userName}) {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.totalDonation}>
+        Total Donations:Rs. {totalDonations}{' '}
+      </Text>
       <FlatList
         data={donationHistory}
         keyExtractor={item => item.id.toString()}
@@ -55,6 +59,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: 'white',
   },
   card: {
     backgroundColor: '#00539C',
@@ -69,6 +74,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginBottom: 8,
   },
+  totalDonation: {fontSize: 15, fontWeight: 'bold', color: 'black'},
 });
 
 export default DonationHistoryScreen;
