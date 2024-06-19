@@ -83,7 +83,7 @@ const SignupScreen = ({navigation}) => {
     }
 
     try {
-      const apiUrl = 'http://3.6.89.38:9090/api/v1/userController/signup';
+      const apiUrl = 'http://65.2.123.63:8080/api/v1/userController/signup';
 
       const userData = {
         firstName: name,
@@ -95,8 +95,6 @@ const SignupScreen = ({navigation}) => {
         password: password,
         confirmPassword: confirmPassword,
       };
-
-      console.log('body: ', userData);
 
       const response = await axios.post(apiUrl, JSON.stringify(userData), {
         headers: {
@@ -111,7 +109,6 @@ const SignupScreen = ({navigation}) => {
           ToastAndroid.SHORT,
           ToastAndroid.CENTER,
         );
-        console.log(response.data);
         navigation.navigate('Login');
       } else {
         ToastAndroid.showWithGravity(
@@ -119,7 +116,6 @@ const SignupScreen = ({navigation}) => {
           ToastAndroid.SHORT,
           ToastAndroid.CENTER,
         );
-        console.log(response.status);
       }
     } catch (error) {
       console.error('Error signing up:', error);

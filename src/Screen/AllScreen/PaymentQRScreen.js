@@ -1,4 +1,4 @@
-/* eslint-disable prettier/prettier */
+/* eslint-disable react-native/no-inline-styles */ /* eslint-disable prettier/prettier */
 import React, {useEffect, useState} from 'react';
 import {
   View,
@@ -20,7 +20,6 @@ import {
 
 const PaymentQRScreen = ({navigation, route}) => {
   const {donationAmount, date, donationNote} = route.params;
-  // console.log(donationAmount, "ss");
   const [paymentImage, setPaymentImage] = useState(null);
   const [imageName, setImageName] = useState('');
   const [bankDetails, setBankDetails] = useState([]);
@@ -51,15 +50,15 @@ const PaymentQRScreen = ({navigation, route}) => {
     }
   };
 
-  // console.log(donationBody, "data");
   const [loading, setIsLoading] = useState(false);
 
   const getBankDetails = async () => {
     try {
-      const response = await axios.get('http://3.6.89.38:9090/api/v1/bank/get');
+      const response = await axios.get(
+        'http://65.2.123.63:8080/api/v1/bank/get',
+      );
       if (response.status === 200) {
         setBankDetails(response.data[0]);
-        // console.log(response.data[0]);
       } else {
         console.log(
           'Error saving bank details:',
@@ -80,7 +79,7 @@ const PaymentQRScreen = ({navigation, route}) => {
   let base64Url;
 
   async function GetMyProfileData() {
-    const apiUrl = `http://3.6.89.38:9090/api/v1/fileAttachment/getFile?fileName=${bankDetails.imageName}`;
+    const apiUrl = `http://65.2.123.63:8080/api/v1/fileAttachment/getFile?fileName=${bankDetails.imageName}`;
 
     const response = await axios.get(apiUrl);
     let profileData;
@@ -107,7 +106,7 @@ const PaymentQRScreen = ({navigation, route}) => {
         type: 'image/jpg',
       });
       const response = await axios.post(
-        'http://3.6.89.38:9090/api/v1/fileAttachment/file',
+        'http://65.2.123.63:8080/api/v1/fileAttachment/file',
         formData,
         {
           headers: {
@@ -116,23 +115,16 @@ const PaymentQRScreen = ({navigation, route}) => {
         },
       );
       if (response.status === 200) {
-        console.log('response image', response.data);
         ToastAndroid.showWithGravity(
           'QR Code Uploaded successfully!',
           ToastAndroid.SHORT,
           ToastAndroid.CENTER,
         );
-        console.log('QR Code Uploaded successfully!');
       } else {
         ToastAndroid.showWithGravity(
           `Error Uploading QR Code: ${response.status} ${response.statusText}`,
           ToastAndroid.SHORT,
           ToastAndroid.CENTER,
-        );
-        console.log(
-          'Error Uploading QR Code:',
-          response.status,
-          response.statusText,
         );
       }
     } catch (error) {
@@ -159,7 +151,7 @@ const PaymentQRScreen = ({navigation, route}) => {
         date: date,
       };
       const response = await axios.post(
-        'http://3.6.89.38:9090/api/v1/donation/save',
+        'http://65.2.123.63:8080/api/v1/donation/save',
         donationBody,
       );
       if (response.status === 200) {
@@ -177,7 +169,6 @@ const PaymentQRScreen = ({navigation, route}) => {
         ToastAndroid.SHORT,
         ToastAndroid.CENTER,
       );
-      console.log('tt', error);
     } finally {
       setIsLoading(false);
     }

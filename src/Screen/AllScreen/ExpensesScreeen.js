@@ -26,7 +26,7 @@ function ExpenseCard({expense}) {
 
   async function GetMyProfileData() {
     try {
-      const apiUrl = `http://3.6.89.38:9090/api/v1/fileAttachment/getFile?fileName=${expense.imageName}`;
+      const apiUrl = `http://65.2.123.63:8080/api/v1/fileAttachment/getFile?fileName=${expense.imageName}`;
       const response = await axios.get(apiUrl);
 
       if (response.status === 200) {
@@ -101,7 +101,7 @@ const ExpensesScreen = () => {
   const getTotalDonation = async () => {
     try {
       const apiUrl =
-        'http://3.6.89.38:9090/api/v1/donation/get/approved?filter=all';
+        'http://65.2.123.63:8080/api/v1/donation/get/approved?filter=all';
 
       const response = await axios.get(apiUrl);
 
@@ -117,7 +117,7 @@ const ExpensesScreen = () => {
   const getTotalBorrow = async () => {
     try {
       const apiUrl =
-        'http://3.6.89.38:9090/api/v1/borrowing/get/approved?filter=all';
+        'http://65.2.123.63:8080/api/v1/borrowing/get/approved?filter=all';
 
       const response = await axios.get(apiUrl);
 
@@ -151,7 +151,6 @@ const ExpensesScreen = () => {
       totalBorrow !== undefined &&
       totalExpenses !== undefined
     ) {
-      console.log(totalBorrow, totalDonation, totalExpenses);
       const adminAvailableExpense = totalDonation - totalBorrow - totalExpenses;
       setAvailableExpense(adminAvailableExpense);
     }
@@ -159,7 +158,7 @@ const ExpensesScreen = () => {
 
   const fetchExpensesList = async () => {
     try {
-      const apiUrl = `http://3.6.89.38:9090/api/v1/expenses/getAll?filter=${selectedFilter}`;
+      const apiUrl = `http://65.2.123.63:8080/api/v1/expenses/getAll?filter=${selectedFilter}`;
       const response = await axios.get(apiUrl);
 
       if (response.status === 200) {
@@ -213,7 +212,7 @@ const ExpensesScreen = () => {
         type: 'image/jpg',
       });
       const response = await axios.post(
-        'http://3.6.89.38:9090/api/v1/fileAttachment/file',
+        'http://65.2.123.63:8080/api/v1/fileAttachment/file',
         formData,
         {
           headers: {
@@ -227,7 +226,6 @@ const ExpensesScreen = () => {
           ToastAndroid.SHORT,
           ToastAndroid.CENTER,
         );
-        console.log('Receipt Uploaded successfully!');
       } else {
         ToastAndroid.showWithGravity(
           `Error Uploading Receipt Code: ${response.status} ${response.statusText}`,
@@ -300,7 +298,7 @@ const ExpensesScreen = () => {
       };
 
       const response = await axios.post(
-        'http://3.6.89.38:9090/api/v1/expenses/addExpenses',
+        'http://65.2.123.63:8080/api/v1/expenses/addExpenses',
         JSON.stringify(expenseData),
         {
           headers: {

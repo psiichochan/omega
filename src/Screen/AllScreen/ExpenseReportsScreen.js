@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
@@ -20,9 +20,8 @@ const ExpenseReportsScreen = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // Default filter is 'all'
 
-  const GetAllExpenses = async () => {
-    const apiUrl = `http://3.6.89.38:9090/api/v1/expenses/getAll?filter=${filter}`;
-
+  const GetAllExpenses = useCallback(async () => {
+    const apiUrl = `http://65.2.123.63:8080/api/v1/expenses/getAll?filter=${filter}`;
     try {
       const response = await axios.get(apiUrl);
 
@@ -47,11 +46,11 @@ const ExpenseReportsScreen = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filter]);
 
   useEffect(() => {
     GetAllExpenses();
-  }, [filter]); // Trigger API call when the filter changes
+  }, [GetAllExpenses, filter]); // Trigger API call when the filter changes
 
   const handleFilterChange = value => {
     setFilter(value);

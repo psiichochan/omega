@@ -7,7 +7,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
-  SafeAreaView,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -22,7 +21,6 @@ import {ScrollView} from 'react-native-gesture-handler';
 function ProfileScreen({route}) {
   const navigation = useNavigation();
 
-  const [userDetails, setUserDetails] = useState([]);
   const [isAdmin, setIsAdmin] = useState(null);
 
   const getUserDetails = async () => {
@@ -30,32 +28,13 @@ function ProfileScreen({route}) {
     const allDetails = JSON.parse(userDetails1);
     const hello = allDetails.email === 'rpdhole25@gmail.com' ? true : false;
     setIsAdmin(hello);
-    setUserDetails(allDetails);
   };
   useEffect(() => {
     getUserDetails();
   });
 
-  const navigateToAbout = () => {
-    Alert.alert(
-      'About',
-      'Yet to add about.',
-      [
-        {
-          text: 'OK',
-          onPress: () => console.log('OK Pressed'),
-        },
-      ],
-      {cancelable: false},
-    );
-  };
-
   const navigateToNotificationScreen = () => {
     navigation.navigate('NotificationScreen');
-  };
-
-  const navigateToPaymentMethods = () => {
-    navigation.navigate('PaymentMethods');
   };
 
   const navigateToAppSettings = () => {
@@ -112,7 +91,7 @@ function ProfileScreen({route}) {
           style={styles.profileImage}
           source={require('../../../assets/AllImages/profilePic.jpg')}
         />
-        {/* About Section */}
+
         <TouchableOpacity style={styles.card} onPress={navigateToMyProfile}>
           <Text style={styles.cardTitle}>My Profile</Text>
         </TouchableOpacity>

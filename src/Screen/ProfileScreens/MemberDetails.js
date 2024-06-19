@@ -17,19 +17,19 @@ import {
 } from 'react-native-responsive-screen';
 
 function MemberDetails() {
-  const [userDetails, setuserDetails] = useState([]);
+  const [userDetails, setUserDetails] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const getAllUserDetails = async () => {
     try {
-      const apiUrl = 'http://3.6.89.38:9090/api/v1/userController/getAllUser';
+      const apiUrl = 'http://65.2.123.63:8080/api/v1/userController/getAllUser';
       const response = await axios.get(apiUrl);
 
       if (response.status === 200) {
-        setuserDetails(response.data);
-        setLoading(false); // Set loading to false on successful API call
+        setUserDetails(response.data);
+        setLoading(false);
       } else {
         ToastAndroid.showWithGravity(
           "Error While Fetching User's List",
@@ -38,7 +38,6 @@ function MemberDetails() {
         );
       }
     } catch (error) {
-      console.log('Error while Fetching UserDetails: ', error);
       ToastAndroid.showWithGravity(
         "Error While Fetching User's List",
         ToastAndroid.BOTTOM,

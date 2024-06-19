@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import {
   View,
   Text,
@@ -21,8 +21,8 @@ const BorrowScreenReports = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // Default filter is 'all'
 
-  const getBorrowReports = async () => {
-    const apiUrl = `http://3.6.89.38:9090/api/v1/borrowing/get/approved?filter=${filter}`;
+  const getBorrowReports = useCallback(async () => {
+    const apiUrl = `http://65.2.123.63:8080/api/v1/borrowing/get/approved?filter=${filter}`;
 
     try {
       const response = await axios.get(apiUrl);
@@ -55,11 +55,11 @@ const BorrowScreenReports = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filter]);
 
   useEffect(() => {
     getBorrowReports();
-  }, [filter]);
+  }, [filter, getBorrowReports]);
 
   const exportDataToExcel = async () => {
     try {

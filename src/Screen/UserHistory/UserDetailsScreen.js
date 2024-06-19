@@ -21,7 +21,7 @@ function UserDetails() {
 
   const getAllUserDetails = async () => {
     try {
-      const apiUrl = 'http://3.6.89.38:9090/api/v1/userController/getAllUser';
+      const apiUrl = 'http://65.2.123.63:8080/api/v1/userController/getAllUser';
       const response = await axios.get(apiUrl);
 
       if (response.status === 200) {
@@ -29,7 +29,6 @@ function UserDetails() {
         const approvedUsers = response.data.filter(user => user.approved);
 
         setuserDetails(approvedUsers);
-        console.log(approvedUsers[0]);
       } else {
         ToastAndroid.showWithGravity(
           "Error While Fetching User's List",
@@ -37,13 +36,16 @@ function UserDetails() {
         );
       }
     } catch (error) {
-      console.log('Error while Fetching UserDetails: ', error);
+      ToastAndroid.showWithGravity(
+        `Error while Fetching UserDetails: ${error}`,
+        ToastAndroid.BOTTOM,
+      );
     }
   };
 
-  const getStatusColor = status => {
-    return status ? 'green' : 'red';
-  };
+  // const getStatusColor = status => {
+  //   return status ? 'green' : 'red';
+  // };
 
   const showUserDetails = user => {
     // Navigate to the next screen and pass the id and username

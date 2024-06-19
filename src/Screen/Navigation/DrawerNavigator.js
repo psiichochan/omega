@@ -1,4 +1,4 @@
-/* eslint-disable react/no-unstable-nested-components */ /* eslint-disable prettier/prettier */
+/* eslint-disable react-native/no-inline-styles */ /* eslint-disable react/no-unstable-nested-components */ /* eslint-disable prettier/prettier */
 import {
   StyleSheet,
   Text,
@@ -31,28 +31,13 @@ const ExpandableList = ({nav, items, onMainListClick, onSubListClick}) => {
             setSelectedValue({...selectedValue, [index]: item.value});
             onMainListClick(nav, item, null);
           }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              height: 30,
-              marginLeft: 15,
-            }}>
+          <View style={styles.iconContainer}>
             {item.icon}
             <Text style={[styles.drawerLabelStyle, {marginLeft: 15}]}>
               {item.title}
             </Text>
           </View>
         </TouchableOpacity>
-        {/* <View
-          style={{
-            borderColor: '#AE285D',
-            borderWidth: 2,
-            width: wp(58),
-            borderRadius: 3,
-            alignSelf: 'center',
-          }}
-        /> */}
       </View>
     );
   };
@@ -163,23 +148,19 @@ function DrawerNavigator({navigation}) {
   const GetUserDetails = async () => {
     const userDetailsJson = await AsyncStorage.getItem('UserDetails');
     const userDetails = JSON.parse(userDetailsJson);
-    const apiUrl = `http://3.6.89.38:9090/api/v1/userController/getUser/username?username=${userDetails.username}`;
-    console.log(userDetails);
+    const apiUrl = `http://65.2.123.63:8080/api/v1/userController/getUser/username?username=${userDetails.username}`;
     const response = await axios.get(apiUrl);
     if (response.status === 200) {
       setImageName(response.data.profile_pic);
-    } else {
-      console.log(response.status);
     }
   };
 
   let base64Url;
   async function GetMyProfileData() {
-    const apiUrl = `http://3.6.89.38:9090/api/v1/fileAttachment/getFile?fileName=${imageName}`;
+    const apiUrl = `http://65.2.123.63:8080/api/v1/fileAttachment/getFile?fileName=${imageName}`;
 
     const response = await axios.get(apiUrl);
     let profileData;
-    console.log(response.status);
     if (response.status === 200) {
       base64Url = JSON.stringify(response.data.data.data);
 
@@ -240,5 +221,11 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     borderRadius: 100,
     marginTop: hp(3),
+  },
+  iconContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 30,
+    marginLeft: 15,
   },
 });

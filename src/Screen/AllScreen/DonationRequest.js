@@ -1,7 +1,7 @@
 /* eslint-disable no-catch-shadow */ /* eslint-disable no-shadow */ /* eslint-disable prettier/prettier */
 
 import axios from 'axios';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
@@ -15,7 +15,6 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function BorrowCard({borrow, onUpdate, GetDonationUnApproved}) {
   const [loading, setLoading] = useState(true);
@@ -31,19 +30,17 @@ function BorrowCard({borrow, onUpdate, GetDonationUnApproved}) {
       borrow.date,
     );
     GetDonationUnApproved();
-    console.log('this is borrow ID: ', borrow.id);
   };
 
-  async function GetMyProfileData() {
+  const GetMyProfileData = useCallback(async () => {
     try {
-      const apiUrl = `http://3.6.89.38:9090/api/v1/fileAttachment/getFile?fileName=${borrow.screenshot}`;
+      const apiUrl = `http://65.2.123.63:8080/api/v1/fileAttachment/getFile?fileName=${borrow.screenshot}`;
       const response = await axios.get(apiUrl);
 
       if (response.status === 200) {
         const base64Url = JSON.stringify(response.data.data.data);
         const base64Icon = `data:image/png;base64,${base64Url}`;
         setImageUrl(base64Icon);
-        console.log(imageUrl);
       } else {
         // Handle error appropriately
         ToastAndroid.showWithGravity(
@@ -63,15 +60,14 @@ function BorrowCard({borrow, onUpdate, GetDonationUnApproved}) {
       // Update loading state
       setLoading(false);
     }
-  }
+  }, [borrow.screenshot]);
 
   useEffect(() => {
     GetMyProfileData();
-  }, []);
+  }, [GetMyProfileData]);
 
   const dateString = borrow.date;
   const [datePart] = dateString.split('T');
-  console.log('this is Borrow: ', borrow);
   return (
     <View style={styles.card}>
       <Text style={styles.amount}>{`Name: ${borrow.username}`}</Text>
@@ -106,14 +102,10 @@ function DonationRequestScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    console.log('BorrowRequestScreen rendered');
-  }, []);
-
   async function GetDonationUnApproved() {
     try {
       const response = await axios.get(
-        'http://3.6.89.38:9090/api/v1/donation/get/unapproved',
+        'http://65.2.123.63:8080/api/v1/donation/get/unapproved',
       );
 
       if (response.status === 200) {
@@ -148,7 +140,7 @@ function DonationRequestScreen() {
         status: status,
       };
       const response = await axios.put(
-        'http://3.6.89.38:9090/api/v1/donation/update',
+        'http://65.2.123.63:8080/api/v1/donation/update',
         requestBody,
         {
           headers: {

@@ -75,7 +75,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#00539C',
     borderRadius: 10,
     alignItems: 'center',
-    // justifyContent: 'center',
     alignSelf: 'center',
   },
   cardTitle: {

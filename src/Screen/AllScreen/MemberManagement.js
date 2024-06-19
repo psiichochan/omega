@@ -2,14 +2,9 @@
 import React from 'react';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {NavigationContainer} from '@react-navigation/native';
-import DonationRequestScreen from './DonationRequest';
-import BorrowRequestScreen from './BorrowRequest';
 import MemberRequest from './MemberRequest';
 import MemberDetails from '../ProfileScreens/MemberDetails';
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
+import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 
 const Tab = createMaterialTopTabNavigator();
 

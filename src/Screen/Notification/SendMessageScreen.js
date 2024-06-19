@@ -24,7 +24,7 @@ const SendMessageScreen = ({navigation}) => {
         date: new Date().toISOString(),
       };
 
-      const apiUrl = 'http://3.6.89.38:9090/api/v1/notification/save';
+      const apiUrl = 'http://65.2.123.63:8080/api/v1/notification/save';
       const response = await axios.post(apiUrl, requestBody, {
         headers: {
           'Content-Type': 'application/json',
@@ -41,7 +41,11 @@ const SendMessageScreen = ({navigation}) => {
         setTitle('');
       }
     } catch (error) {
-      console.log('error in the code: ', error);
+      ToastAndroid.showWithGravity(
+        error,
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
     }
   };
 

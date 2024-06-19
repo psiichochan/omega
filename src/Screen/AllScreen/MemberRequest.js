@@ -56,7 +56,7 @@ function MemberRequest() {
   const getUnapprovedUser = async () => {
     try {
       const apiUrl =
-        'http://3.6.89.38:9090/api/v1/userController/getAllUser/unapproved';
+        'http://65.2.123.63:8080/api/v1/userController/getAllUser/unapproved';
 
       const response = await axios.get(apiUrl);
 
@@ -90,7 +90,7 @@ function MemberRequest() {
 
   const handleApprove = async profileId => {
     try {
-      const apiUrl = 'http://3.6.89.38:9090/api/v1/userController/update';
+      const apiUrl = 'http://65.2.123.63:8080/api/v1/userController/update';
 
       const profileToUpdate = profiles.find(
         profile => profile.id === profileId,
@@ -104,7 +104,6 @@ function MemberRequest() {
       const response = await axios.put(apiUrl, updatedProfileData);
 
       if (response.status === 200) {
-        console.log(`User with ID ${profileId} has been approved.`);
         setProfiles(prevProfiles =>
           prevProfiles.filter(profile => profile.id !== profileId),
         );
@@ -123,7 +122,7 @@ function MemberRequest() {
 
   const handleDecline = async profileId => {
     try {
-      const apiUrl = 'http://3.6.89.38:9090/api/v1/userController/update';
+      const apiUrl = 'http://65.2.123.63:8080/api/v1/userController/update';
 
       const profileToUpdate = profiles.find(
         profile => profile.id === profileId,
@@ -137,7 +136,6 @@ function MemberRequest() {
       const response = await axios.put(apiUrl, updatedProfileData);
 
       if (response.status === 200) {
-        console.log(`User with ID ${profileId} has been declined.`);
         setProfiles(prevProfiles =>
           prevProfiles.filter(profile => profile.id !== profileId),
         );
@@ -170,7 +168,7 @@ function MemberRequest() {
           ))}
           {contain === true ? (
             <View>
-              <Text style={styles.containTexxt}>No data present</Text>
+              <Text style={styles.containText}>No data present</Text>
             </View>
           ) : (
             <View />
@@ -187,7 +185,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
   },
-  containTexxt: {fontSize: 20, fontWeight: 'bold', color: 'black', top: hp(10)},
+  containText: {fontSize: 20, fontWeight: 'bold', color: 'black', top: hp(10)},
   card: {
     width: '80%',
     padding: 15,

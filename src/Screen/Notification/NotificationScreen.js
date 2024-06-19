@@ -8,7 +8,7 @@ function NotificationScreen() {
 
   useEffect(() => {
     axios
-      .get('http://3.6.89.38:9090/api/v1/notification/getAll')
+      .get('http://65.2.123.63:8080/api/v1/notification/getAll')
       .then(response => setNotifications(response.data.reverse()))
       .catch(error => console.error('Error fetching notifications:', error));
   }, []);

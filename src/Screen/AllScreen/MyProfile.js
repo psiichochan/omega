@@ -1,7 +1,6 @@
-/* eslint-disable react-native/no-inline-styles */
-/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-native/no-inline-styles */ /* eslint-disable prettier/prettier */
 /* eslint-disable prettier/prettier */
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
@@ -25,28 +24,28 @@ import {
 
 function MyProfileScreen() {
   const [qrImage1, setqrImage1] = useState(null);
-  const [imageName1, setimageName1] = useState('');
+  const [imageName1, setImageName1] = useState('');
   const [qrImage2, setqrImage2] = useState(null);
 
-  const [imageName2, setimageName2] = useState('');
-  const [name, setname] = useState('');
-  const [mobileNo, setmobileNo] = useState('');
-  const [email, setemail] = useState('');
-  const [address, setaddress] = useState('');
-  const [bankName, setbankName] = useState('');
-  const [accountNo, setaccountNo] = useState('');
-  const [ifscCode, setifscCode] = useState('');
-  const [upiId, setupiId] = useState('');
+  const [imageName2, setImageName2] = useState('');
+  const [name, setName] = useState('');
+  const [mobileNo, setMobileNo] = useState('');
+  const [email, setEmail] = useState('');
+  const [address, setAddress] = useState('');
+  const [bankName, setBankName] = useState('');
+  const [accountNo, setAccountNo] = useState('');
+  const [ifscCode, setIfscCode] = useState('');
+  const [upiId, setUpiId] = useState('');
   const [userName, setUserName] = useState('');
   const [details, setDetails] = useState([]);
   const [editMode, setEditMode] = useState(false);
 
-  const extractimageName1 = path => {
+  const extractImageName1 = path => {
     const pathArray = path.split('/');
     const filename = pathArray[pathArray.length - 1];
     return filename;
   };
-  const extractimageName2 = path => {
+  const extractImageName2 = path => {
     const pathArray = path.split('/');
     const filename = pathArray[pathArray.length - 1];
     return filename;
@@ -61,10 +60,10 @@ function MyProfileScreen() {
       });
 
       if (image) {
-        const name = extractimageName1(image.path);
+        const name1 = extractImageName1(image.path);
         const imagePath = image.path;
         setqrImage1(imagePath);
-        setimageName1(name);
+        setImageName1(name1);
       }
     } catch (error) {
       console.log('ImagePicker Error: ', error);
@@ -80,10 +79,10 @@ function MyProfileScreen() {
       });
 
       if (image) {
-        const name = extractimageName2(image.path);
+        const name1 = extractImageName2(image.path);
         const imagePath = image.path;
         setqrImage2(imagePath);
-        setimageName2(name);
+        setImageName2(name1);
       }
     } catch (error) {
       console.log('ImagePicker Error: ', error);
@@ -101,7 +100,7 @@ function MyProfileScreen() {
       });
 
       const response = await axios.post(
-        'http://3.6.89.38:9090/api/v1/fileAttachment/file',
+        'http://65.2.123.63:8080/api/v1/fileAttachment/file',
         formData,
         {
           headers: {
@@ -109,24 +108,17 @@ function MyProfileScreen() {
           },
         },
       );
-      // console.log("response image", response.status);
       if (response.status === 200) {
         ToastAndroid.showWithGravity(
           'QR Code Uploaded successfully!',
           ToastAndroid.SHORT,
           ToastAndroid.CENTER,
         );
-        console.log('QR Code Uploaded successfully!');
       } else {
         ToastAndroid.showWithGravity(
           `Error Uploading QR Code: ${response.status} ${response.statusText}`,
           ToastAndroid.SHORT,
           ToastAndroid.CENTER,
-        );
-        console.log(
-          'Error Uploading QR Code:',
-          response.status,
-          response.statusText,
         );
       }
     } catch (error) {
@@ -150,7 +142,7 @@ function MyProfileScreen() {
       });
 
       const response = await axios.post(
-        'http://3.6.89.38:9090/api/v1/fileAttachment/file',
+        'http://65.2.123.63:8080/api/v1/fileAttachment/file',
         formData,
         {
           headers: {
@@ -158,24 +150,17 @@ function MyProfileScreen() {
           },
         },
       );
-      // console.log("response image", response.status);
       if (response.status === 200) {
         ToastAndroid.showWithGravity(
           'QR Code Uploaded successfully!',
           ToastAndroid.SHORT,
           ToastAndroid.CENTER,
         );
-        console.log('QR Code Uploaded successfully!');
       } else {
         ToastAndroid.showWithGravity(
           `Error Uploading QR Code: ${response.status} ${response.statusText}`,
           ToastAndroid.SHORT,
           ToastAndroid.CENTER,
-        );
-        console.log(
-          'Error Uploading QR Code:',
-          response.status,
-          response.statusText,
         );
       }
     } catch (error) {
@@ -189,16 +174,16 @@ function MyProfileScreen() {
   }
   const handleEdit = () => {
     if (!editMode) {
-      setname(details.firstName);
-      setmobileNo(details.mobileNo);
-      setemail(details.email);
-      setaddress(details.address);
-      setbankName(details.bank_name);
-      setaccountNo(details.accountNo);
-      setifscCode(details.ifscCode);
-      setupiId(details.upiId);
-      setimageName1(details.profile_pic);
-      setimageName2(details.imageName);
+      setName(details.firstName);
+      setMobileNo(details.mobileNo);
+      setEmail(details.email);
+      setAddress(details.address);
+      setBankName(details.bank_name);
+      setAccountNo(details.accountNo);
+      setIfscCode(details.ifscCode);
+      setUpiId(details.upiId);
+      setImageName1(details.profile_pic);
+      setImageName2(details.imageName);
     }
     setEditMode(!editMode);
   };
@@ -226,10 +211,9 @@ function MyProfileScreen() {
         status: details.status,
         created_date: details.created_date,
       };
-      console.log(updateData);
 
       const response = await axios.put(
-        'http://3.6.89.38:9090/api/v1/userController/update',
+        'http://65.2.123.63:8080/api/v1/userController/update',
         updateData,
         {
           headers: {
@@ -237,7 +221,6 @@ function MyProfileScreen() {
           },
         },
       );
-      console.log(updateData);
 
       if (response.status === 200) {
         ImageUpload1();
@@ -254,11 +237,6 @@ function MyProfileScreen() {
           ToastAndroid.SHORT,
           ToastAndroid.CENTER,
         );
-        console.log(
-          'Error Updating Profile:',
-          response.status,
-          response.statusText,
-        );
       }
     } catch (error) {
       ToastAndroid.showWithGravity(
@@ -270,16 +248,16 @@ function MyProfileScreen() {
     }
   };
 
-  const storedDetails = async () => {
+  const storedDetails = useCallback(async () => {
     const data = await AsyncStorage.getItem('UserDetails');
     const parsedData = JSON.parse(data);
     setUserName(parsedData.username);
     return parsedData.username;
-  };
+  }, []);
 
-  const getDetails = async () => {
+  const getDetails = useCallback(async () => {
     try {
-      const apiUrl = `http://3.6.89.38:9090/api/v1/userController/getUser/username?username=${userName}`;
+      const apiUrl = `http://65.2.123.63:8080/api/v1/userController/getUser/username?username=${userName}`;
       const response = await axios.get(apiUrl);
       if (response.status === 200) {
         setDetails(response.data);
@@ -287,10 +265,10 @@ function MyProfileScreen() {
     } catch (error) {
       console.log(error);
     }
-  };
-  const GetQrImage = async () => {
+  }, [userName]);
+  const GetQrImage = useCallback(async () => {
     try {
-      const apiUrl = `http://3.6.89.38:9090/api/v1/fileAttachment/getFile?fileName=${details.imageName}`;
+      const apiUrl = `http://65.2.123.63:8080/api/v1/fileAttachment/getFile?fileName=${details.imageName}`;
       const response = await axios.get(apiUrl);
       let profileData;
       let base64Url;
@@ -301,11 +279,11 @@ function MyProfileScreen() {
         setqrImage2(profileData);
       }
     } catch (error) {}
-  };
+  }, [details.imageName]);
 
-  const GetProfileImage = async () => {
+  const GetProfileImage = useCallback(async () => {
     try {
-      const apiUrl = `http://3.6.89.38:9090/api/v1/fileAttachment/getFile?fileName=${details.profile_pic}`;
+      const apiUrl = `http://65.2.123.63:8080/api/v1/fileAttachment/getFile?fileName=${details.profile_pic}`;
       const response = await axios.get(apiUrl);
       let profileData;
       let base64Url;
@@ -316,11 +294,11 @@ function MyProfileScreen() {
         setqrImage1(profileData);
       }
     } catch (error) {}
-  };
+  }, [details.profile_pic]);
 
-  const GetQRImage = async () => {
+  const GetQRImage = useCallback(async () => {
     try {
-      const apiUrl = `http://3.6.89.38:9090/api/v1/fileAttachment/getFile?fileName=${details.imageName}`;
+      const apiUrl = `http://65.2.123.63:8080/api/v1/fileAttachment/getFile?fileName=${details.imageName}`;
       const response = await axios.get(apiUrl);
       let profileData;
       let base64Url;
@@ -331,7 +309,7 @@ function MyProfileScreen() {
         setqrImage2(profileData);
       }
     } catch (error) {}
-  };
+  }, [details.imageName]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -350,13 +328,20 @@ function MyProfileScreen() {
     fetchData(); // Call fetchData function immediately
 
     // Note: You should include the functions and variables that are used inside the effect in the dependency array to avoid lint warnings.
-  }, [userName, storedDetails, getDetails]);
+  }, [
+    userName,
+    storedDetails,
+    getDetails,
+    GetQrImage,
+    GetProfileImage,
+    GetQRImage,
+  ]);
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{flex: 1, backgroundColor: 'white'}}>
-      <ScrollView contentContainerStyle={{flexGrow: 1}}>
+      style={styles.keyBoardStyle}>
+      <ScrollView contentContainerStyle={styles.scrollViewStyle}>
         <View>
           <View style={styles.qrContainer}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -368,17 +353,8 @@ function MyProfileScreen() {
                   </TouchableOpacity>
                 )}
               </View>
-              <View
-                style={{
-                  borderColor: 'black',
-                  borderWidth: 2,
-                  height: wp(15),
-                  borderRadius: 3,
-                  alignSelf: 'center',
-                  marginLeft: wp(7),
-                }}
-              />
-              <View style={styles.buttonContainer}>
+              <View style={styles.qrContainer} />
+              <View style={styles.buttonContainer1}>
                 {editMode ? (
                   <Button
                     title="Save"
@@ -397,15 +373,7 @@ function MyProfileScreen() {
               </View>
             </View>
           </View>
-          <Text
-            style={{
-              color: 'black',
-              fontWeight: 'bold',
-              fontSize: hp(2),
-              textAlign: 'center',
-            }}>
-            Personal Information
-          </Text>
+          <Text style={styles.buttonContainer}>Personal Information</Text>
 
           {/* Text and TextInput Components */}
           <View style={{alignItems: 'center'}}>
@@ -416,7 +384,7 @@ function MyProfileScreen() {
               placeholderTextColor="black"
               value={editMode ? name : details.firstName}
               onChangeText={text => {
-                setname(text);
+                setName(text);
               }}
               editable={editMode}
             />
@@ -430,7 +398,7 @@ function MyProfileScreen() {
               placeholder="Mobile No"
               placeholderTextColor="black"
               value={editMode ? mobileNo : details.mobileNo}
-              onChangeText={text => setmobileNo(text)}
+              onChangeText={text => setMobileNo(text)}
               editable={editMode}
             />
           </View>
@@ -443,7 +411,7 @@ function MyProfileScreen() {
               placeholder="Email Id"
               placeholderTextColor="black"
               value={editMode ? email : details.email}
-              onChangeText={text => setemail(text)}
+              onChangeText={text => setEmail(text)}
               editable={editMode}
             />
           </View>
@@ -456,11 +424,11 @@ function MyProfileScreen() {
               placeholder="Address"
               placeholderTextColor="black"
               value={editMode ? address : details.address}
-              onChangeText={text => setaddress(text)}
+              onChangeText={text => setAddress(text)}
               editable={editMode}
             />
           </View>
-          <View style={styles.buttonContainer}></View>
+          <View style={styles.buttonContainer} />
           <Text
             style={{
               fontSize: hp(2),
@@ -490,7 +458,7 @@ function MyProfileScreen() {
               placeholder="Bank Name"
               placeholderTextColor="black"
               value={editMode ? bankName : details.bank_name}
-              onChangeText={text => setbankName(text)}
+              onChangeText={text => setBankName(text)}
               editable={editMode}
             />
           </View>
@@ -503,7 +471,7 @@ function MyProfileScreen() {
               placeholder="Account No."
               placeholderTextColor="black"
               value={editMode ? accountNo : details.accountNo}
-              onChangeText={text => setaccountNo(text)}
+              onChangeText={text => setAccountNo(text)}
               editable={editMode}
             />
           </View>
@@ -516,7 +484,7 @@ function MyProfileScreen() {
               placeholder="Ifsc Code"
               placeholderTextColor="black"
               value={editMode ? ifscCode : details.ifscCode}
-              onChangeText={text => setifscCode(text)}
+              onChangeText={text => setIfscCode(text)}
               editable={editMode}
             />
           </View>
@@ -527,7 +495,7 @@ function MyProfileScreen() {
               placeholder="Upi Id"
               placeholderTextColor="black"
               value={editMode ? upiId : details.upiId}
-              onChangeText={text => setupiId(text)}
+              onChangeText={text => setUpiId(text)}
               editable={editMode}
             />
           </View>
@@ -544,13 +512,22 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     resizeMode: 'contain',
-
     alignContent: 'flex-start',
     marginBottom: 10,
     borderWidth: 2,
     borderColor: 'black',
     borderRadius: 100, // Set the borderRadius to half of width/height to make it circular
   },
+  buttonContainer1: {
+    borderColor: 'black',
+    borderWidth: 2,
+    height: wp(15),
+    borderRadius: 3,
+    alignSelf: 'center',
+    marginLeft: wp(7),
+  },
+  scrollViewStyle: {flexGrow: 1},
+  keyBoardStyle: {flex: 1, backgroundColor: 'white'},
   qrContainer: {
     marginBottom: 20,
     alignItems: 'flex-start',

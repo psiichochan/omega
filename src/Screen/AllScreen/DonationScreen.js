@@ -16,7 +16,6 @@ import {
 } from 'react-native-responsive-screen';
 
 function DonationCard({donation}) {
-  // console.log("hello", donation);
   const dateString = donation.date;
   const [datePart] = dateString.split('T');
   return (
@@ -54,7 +53,7 @@ const DonationsScreen = ({navigation, username}) => {
     }
   };
   const GetApprovedDonationList = async () => {
-    const apiUrl = `http://3.6.89.38:9090/api/v1/donation/get/approved?filter=${selectedValue}`;
+    const apiUrl = `http://65.2.123.63:8080/api/v1/donation/get/approved?filter=${selectedValue}`;
 
     try {
       const response = await axios.get(apiUrl);

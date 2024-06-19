@@ -4,14 +4,13 @@ import {View, Text, FlatList, StyleSheet, ToastAndroid} from 'react-native';
 import axios from 'axios';
 
 function DonationHistoryScreen({userId, userName}) {
-  console.log('routes: ', userId, userName);
   const [donationHistory, setDonationHistory] = useState([]);
   const [totalDonations, setTotalDonations] = useState();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const apiUrl = `http://3.6.89.38:9090/api/v1/userController/user/activities?username=${userName}&id=${userId}&filter=month`;
+        const apiUrl = `http://65.2.123.63:8080/api/v1/userController/user/activities?username=${userName}&id=${userId}&filter=month`;
         const response = await axios.get(apiUrl);
         if (response.status === 200) {
           setDonationHistory(response.data.Donation);
@@ -25,7 +24,11 @@ function DonationHistoryScreen({userId, userName}) {
           );
         }
       } catch (error) {
-        console.log('Error fetching donation history: ', error);
+        ToastAndroid.showWithGravity(
+          `Error fetching donation history: ${error}`,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
       }
     };
 

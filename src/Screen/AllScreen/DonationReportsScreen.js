@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import axios from 'axios';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
@@ -22,8 +22,8 @@ const DonationReportsScreen = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // Default filter is 'all'
 
-  const GetDonationReport = async () => {
-    const apiUrl = `http://3.6.89.38:9090/api/v1/donation/get/approved?filter=${filter}`;
+  const GetDonationReport = useCallback(async () => {
+    const apiUrl = `http://65.2.123.63:8080/api/v1/donation/get/approved?filter=${filter}`;
 
     try {
       const response = await axios.get(apiUrl);
@@ -55,11 +55,11 @@ const DonationReportsScreen = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filter]);
 
   useEffect(() => {
     GetDonationReport();
-  }, [filter]);
+  }, [GetDonationReport, filter]);
 
   const exportDataToExcel = async () => {
     try {

@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable prettier/prettier */
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
@@ -59,48 +59,46 @@ const HomeScreen = ({route, navigation}) => {
     navigation.navigate('BorrowScreen');
   };
 
-  const getApprovedDonations = async () => {
+  const getApprovedDonations = useCallback(async () => {
     try {
       const response = await axios.get(
-        `http://3.6.89.38:9090/api/v1/donation/get/approved?filter=${selectedValue}`,
+        `http://65.2.123.63:8080/api/v1/donation/get/approved?filter=${selectedValue}`,
       );
-      console.log(response.status);
       if (response.status === 200) {
         setTotalDonations(response.data.totalAmount);
-        console.log(response.status);
       } else if (response.status === 204) {
         setTotalDonations(0);
       }
     } catch (e) {
       console.log('error in get donations: ', e);
     }
-  };
+  }, [selectedValue]);
 
-  const getExpenses = async () => {
+  const getExpenses = useCallback(async () => {
     const response = await axios.get(
-      `http://3.6.89.38:9090/api/v1/expenses/getAll?filter=${selectedValue}`,
+      `http://65.2.123.63:8080/api/v1/expenses/getAll?filter=${selectedValue}`,
     );
     if (response.status === 200) {
       setTotalExpenses(response.data.totalAmount);
     } else if (response.status === 204) {
       setTotalExpenses(0);
     }
-  };
+  }, [selectedValue]);
 
-  const getApprovedBorrow = async () => {
+  const getApprovedBorrow = useCallback(async () => {
     const response = await axios.get(
-      `http://3.6.89.38:9090/api/v1/borrowing/get/approved?filter=${selectedValue}`,
+      `http://65.2.123.63:8080/api/v1/borrowing/get/approved?filter=${selectedValue}`,
     );
     if (response.status === 200) {
       setTotalBorrow(response.data.totalAmount);
     } else if (response.status === 204) {
       setTotalBorrow(0);
     }
-  };
+  }, [selectedValue]);
 
-  const GetUserCount = async () => {
+  const GetUserCount = useCallback(async () => {
     try {
-      const apiUrl = `http://3.6.89.38:9090/api/v1/userController/user/filter?filter=${selectedValue}`;
+      const apiUrl = `http://65.2.123.63:8080/api/v1/userController/user/filter?filter=${selectedValue}`;
 
       const response = await axios.get(apiUrl);
 
@@ -116,7 +114,7 @@ const HomeScreen = ({route, navigation}) => {
     } catch (error) {
       console.log('this is error while fetching users count==> ', error);
     }
-  };
+  }, [selectedValue]);
 
   useEffect(() => {
     getApprovedDonations();
@@ -124,9 +122,16 @@ const HomeScreen = ({route, navigation}) => {
     getApprovedBorrow();
     GetUserCount();
     calculateAvailableExpense();
-  }, [selectedValue]);
+  }, [
+    GetUserCount,
+    calculateAvailableExpense,
+    getApprovedBorrow,
+    getApprovedDonations,
+    getExpenses,
+    selectedValue,
+  ]);
 
-  const calculateAvailableExpense = async () => {
+  const calculateAvailableExpense = useCallback(async () => {
     if (
       totalDonations !== undefined &&
       totalBorrow !== undefined &&
@@ -136,8 +141,7 @@ const HomeScreen = ({route, navigation}) => {
         totalDonations - totalBorrow - totalExpenses;
       setAvailableExpense(adminAvailableExpense);
     }
-  };
-  console.log('available balance: ', availableExpense);
+  }, [totalBorrow, totalDonations, totalExpenses]);
 
   return (
     <View style={{flex: 1, backgroundColor: 'white'}}>

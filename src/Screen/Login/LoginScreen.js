@@ -41,7 +41,7 @@ const LoginScreen = ({navigation}) => {
         password: password,
       };
       const response = await axios.post(
-        'http://3.6.89.38:9090/api/v1/userController/login',
+        'http://65.2.123.63:8080/api/v1/userController/login',
         requestBody,
         {
           headers: {
@@ -55,7 +55,6 @@ const LoginScreen = ({navigation}) => {
           ToastAndroid.SHORT,
           ToastAndroid.CENTER,
         );
-        console.log('date: ', response.data);
         const userDetails = JSON.stringify(response.data);
         await AsyncStorage.setItem('UserDetails', userDetails);
 

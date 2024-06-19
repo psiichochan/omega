@@ -3,10 +3,6 @@ import React, {useState, useEffect} from 'react';
 import {View, Text, TextInput, Button, StyleSheet} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
 
 const BasicInfo = ({navigation}) => {
   // Initial state for email, contact number, and address
@@ -26,7 +22,6 @@ const BasicInfo = ({navigation}) => {
   useEffect(() => {
     const fetchUserDetails = async () => {
       const retrievedUserData = await retrieveObject('UserDetails');
-      console.log(retrievedUserData);
 
       if (retrievedUserData) {
         setEmail(retrievedUserData.email || 'N/A');
@@ -39,7 +34,7 @@ const BasicInfo = ({navigation}) => {
   }, []);
 
   const updateUserDetails = async () => {
-    const apiUrl = 'http://3.6.89.38:9090/api/v1/userController/update';
+    const apiUrl = 'http://65.2.123.63:8080/api/v1/userController/update';
     const retrievedUserData = await retrieveObject('UserDetails');
     const requestBody = {
       id: retrievedUserData.id,
@@ -63,8 +58,6 @@ const BasicInfo = ({navigation}) => {
     if (response.status === 200) {
       console.log(response.data);
     }
-
-    console.log('data: ', retrievedUserData);
   };
 
   const handleEmailChange = text => {

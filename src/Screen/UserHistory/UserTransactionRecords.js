@@ -9,7 +9,6 @@ const Tab = createMaterialTopTabNavigator();
 function UserTransactionRecords({route}) {
   const userId = route.params.id;
   const userName = route.params.username;
-  console.log('userId: ', userId, userName);
 
   return (
     <Tab.Navigator

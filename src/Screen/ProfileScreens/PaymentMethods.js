@@ -12,10 +12,6 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import ImagePicker from 'react-native-image-crop-picker';
 import axios from 'axios';
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
 
 const PaymentMethods = () => {
   const navigation = useNavigation();
@@ -52,7 +48,11 @@ const PaymentMethods = () => {
         // setSelectedImage(true); // Set selected image state to true
       }
     } catch (error) {
-      console.log('ImagePicker Error: ', error);
+      ToastAndroid.showWithGravity(
+        `Error in ImagePicker: ${error}`,
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
     }
   };
 
@@ -69,7 +69,7 @@ const PaymentMethods = () => {
   const [loadingImage, setLoadingImage] = useState(false);
 
   const getBankDetails = async () => {
-    const apiUrl = 'http://3.6.89.38:9090/api/v1/bank/get';
+    const apiUrl = 'http://65.2.123.63:8080/api/v1/bank/get';
 
     const response = await axios.get(apiUrl);
 
@@ -92,9 +92,8 @@ const PaymentMethods = () => {
         fileName: 'image',
         type: 'image/jpg',
       });
-      console.log('response image', imageName);
       const response = await axios.post(
-        'http://3.6.89.38:9090/api/v1/fileAttachment/file',
+        'http://65.2.123.63:8080/api/v1/fileAttachment/file',
         formData,
         {
           headers: {
@@ -102,24 +101,17 @@ const PaymentMethods = () => {
           },
         },
       );
-      // console.log("response image", response.status);
       if (response.status === 200) {
         ToastAndroid.showWithGravity(
           'QR Code Uploaded successfully!',
           ToastAndroid.SHORT,
           ToastAndroid.CENTER,
         );
-        console.log('QR Code Uploaded successfully!');
       } else {
         ToastAndroid.showWithGravity(
           `Error Uploading QR Code: ${response.status} ${response.statusText}`,
           ToastAndroid.SHORT,
           ToastAndroid.CENTER,
-        );
-        console.log(
-          'Error Uploading QR Code:',
-          response.status,
-          response.statusText,
         );
       }
     } catch (error) {
@@ -148,7 +140,7 @@ const PaymentMethods = () => {
       };
 
       const response = await axios.put(
-        'http://3.6.89.38:9090/api/v1/bank/details/update',
+        'http://65.2.123.63:8080/api/v1/bank/details/update',
         JSON.stringify(requestBody),
         {
           headers: {
@@ -166,12 +158,11 @@ const PaymentMethods = () => {
         );
         // ImageUpload();
         navigation.goBack();
-        console.log('Bank details saved successfully!');
       } else {
-        console.log(
+        ToastAndroid.showWithGravity(
           'Error saving bank details:',
-          response.status,
-          response.statusText,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
         );
       }
     } catch (error) {

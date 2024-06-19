@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */ /* eslint-disable prettier/prettier */
 import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
+import {View, Text, StyleSheet, ScrollView, ToastAndroid} from 'react-native';
 import axios from 'axios';
 
 const BorrowHistoryScreen = ({userId, userName}) => {
@@ -10,7 +10,7 @@ const BorrowHistoryScreen = ({userId, userName}) => {
   const getUserActivities = async () => {
     try {
       const response = await axios.get(
-        `http://3.6.89.38:9090/api/v1/userController/user/activities?username=${userName}&id=${userId}&filter=month`,
+        `http://65.2.123.63:8080/api/v1/userController/user/activities?username=${userName}&id=${userId}&filter=month`,
       );
 
       if (response.status === 200) {
@@ -19,9 +19,9 @@ const BorrowHistoryScreen = ({userId, userName}) => {
         setTotalBorrow(response.data['Total Borrowings']);
       }
     } catch (error) {
-      console.log('Error fetching borrow history:', error);
-      console.log(
-        `http://3.6.89.38:9090/api/v1/userController/user/activities?username=${userName}&id=${userId}&filter=month`,
+      ToastAndroid.showWithGravity(
+        `http://65.2.123.63:8080/api/v1/userController/user/activities?username=${userName}&id=${userId}&filter=month`,
+        ToastAndroid.BOTTOM,
       );
     }
   };

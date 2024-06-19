@@ -12,7 +12,6 @@ import {
   Image,
 } from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
-
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -34,9 +33,8 @@ function BorrowCard({borrow, onUpdate, GetBorrowUnApproved}) {
     GetBorrowUnApproved();
   };
   const [qrImage2, setqrImage2] = useState(null);
-  const [imageName2, setimageName2] = useState('');
-  console.log('this is borrow ID: ', borrow.borrowedDate);
-  const extractimageName2 = path => {
+  const [imageName2, setImageName2] = useState('');
+  const extractImageName2 = path => {
     const pathArray = path.split('/');
     const filename = pathArray[pathArray.length - 1];
     return filename;
@@ -52,10 +50,10 @@ function BorrowCard({borrow, onUpdate, GetBorrowUnApproved}) {
       });
 
       if (image) {
-        const name = extractimageName2(image.path);
+        const name = extractImageName2(image.path);
         const imagePath = image.path;
         setqrImage2(imagePath);
-        setimageName2(name);
+        setImageName2(name);
       }
     } catch (error) {
       console.log('ImagePicker Error: ', error);
@@ -95,14 +93,10 @@ function BorrowRequestScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    console.log('BorrowRequestScreen rendered');
-  }, []);
-
   async function GetBorrowUnApproved() {
     try {
       const response = await axios.get(
-        'http://3.6.89.38:9090/api/v1/borrowing/get/unapproved',
+        'http://65.2.123.63:8080/api/v1/borrowing/get/unapproved',
       );
 
       if (response.status === 200) {
@@ -139,8 +133,6 @@ function BorrowRequestScreen() {
     const userDetails = await AsyncStorage.getItem('UserDetails');
     const allDetails = JSON.parse(userDetails);
 
-    console.log('this is status: ', status);
-
     try {
       const requestBody = {
         userId: allDetails.id,
@@ -153,9 +145,8 @@ function BorrowRequestScreen() {
         status: status,
         imageName: imageName,
       };
-      console.log('request Body: ', requestBody);
       const response = await axios.put(
-        'http://3.6.89.38:9090/api/v1/borrowing/updateBorrowing',
+        'http://65.2.123.63:8080/api/v1/borrowing/updateBorrowing',
         requestBody,
         {
           headers: {
@@ -173,7 +164,7 @@ function BorrowRequestScreen() {
       });
       console.log('response image', imageName);
       const response1 = await axios.post(
-        'http://3.6.89.38:9090/api/v1/fileAttachment/file',
+        'http://65.2.123.63:8080/api/v1/fileAttachment/file',
         formData,
         {
           headers: {
@@ -188,7 +179,6 @@ function BorrowRequestScreen() {
           ToastAndroid.SHORT,
           ToastAndroid.CENTER,
         );
-        console.log('QR Code Uploaded successfully!');
       } else {
         ToastAndroid.showWithGravity(
           `Error Uploading QR Code: ${response1.status} ${response1.statusText}`,
@@ -214,7 +204,6 @@ function BorrowRequestScreen() {
         prevBorrows.filter(borrow => borrow.id !== borrowId),
       );
       GetBorrowUnApproved();
-      console.log(`borrow ${borrowId} ${status ? 'approved' : 'declined'}`);
     } catch (error) {
       console.error('Error updating borrow:', error);
     }

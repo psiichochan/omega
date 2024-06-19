@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
@@ -23,17 +23,15 @@ import {
 function BorrowCard({item}) {
   const [loading, setLoading] = useState(true);
   const [imageUrl, setImageUrl] = useState();
-  async function GetMyProfileData() {
+  const GetMyProfileData = useCallback(async () => {
     try {
-      const apiUrl = `http://3.6.89.38:9090/api/v1/fileAttachment/getFile?fileName=${item.item.imageName}`;
-      console.log(apiUrl);
+      const apiUrl = `http://65.2.123.63:8080/api/v1/fileAttachment/getFile?fileName=${item.item.imageName}`;
       const response = await axios.get(apiUrl);
 
       if (response.status === 200) {
         const base64Url = JSON.stringify(response.data.data.data);
         const base64Icon = `data:image/png;base64,${base64Url}`;
         setImageUrl(base64Icon);
-        console.log(imageUrl);
       } else {
         // Handle error appropriately
         ToastAndroid.showWithGravity(
@@ -53,11 +51,11 @@ function BorrowCard({item}) {
       // Update loading state
       setLoading(false);
     }
-  }
+  }, [item.item.imageName]);
 
   useEffect(() => {
     GetMyProfileData();
-  }, []);
+  }, [GetMyProfileData]);
 
   return (
     <Card style={styles.recordCard}>
@@ -101,7 +99,7 @@ const BorrowScreen = () => {
 
     try {
       const response = await axios.post(
-        'http://3.6.89.38:9090/api/v1/borrowing/addBorrowing',
+        'http://65.2.123.63:8080/api/v1/borrowing/addBorrowing',
         requestBody,
         {
           headers: {
@@ -125,9 +123,9 @@ const BorrowScreen = () => {
     }
   };
 
-  const getBorrowApprovedList = async () => {
+  const getBorrowApprovedList = useCallback(async () => {
     try {
-      const apiUrl = `http://3.6.89.38:9090/api/v1/borrowing/get/approved?filter=${selectedFilter}`;
+      const apiUrl = `http://65.2.123.63:8080/api/v1/borrowing/get/approved?filter=${selectedFilter}`;
       const response = await axios.get(apiUrl);
 
       if (response.status === 200) {
@@ -157,12 +155,12 @@ const BorrowScreen = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedFilter]);
 
   useEffect(() => {
     setLoading(true);
     getBorrowApprovedList();
-  }, [selectedFilter]);
+  }, [getBorrowApprovedList, selectedFilter]);
 
   return (
     <View style={styles.container}>
@@ -190,7 +188,7 @@ const BorrowScreen = () => {
 
       <RNPickerSelect
         placeholder={{label: 'Select Filter', value: null}}
-        style={{color: 'black'}}
+        style={styles.rnPickerStyle}
         onValueChange={value => setSelectedFilter(value)}
         items={[
           {label: 'Day', value: 'day'},
@@ -237,6 +235,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: 'black',
   },
+  rnPickerStyle: {color: 'black'},
   input: {
     height: 40,
     borderColor: 'black',
