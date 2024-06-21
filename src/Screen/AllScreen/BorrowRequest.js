@@ -56,7 +56,11 @@ function BorrowCard({borrow, onUpdate, GetBorrowUnApproved}) {
         setImageName2(name);
       }
     } catch (error) {
-      console.log('ImagePicker Error: ', error);
+      ToastAndroid.showWithGravity(
+        `Error in ImagePicker Error: ${error}`,
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
     }
   };
   return (
@@ -162,7 +166,6 @@ function BorrowRequestScreen() {
         fileName: 'image',
         type: 'image/jpg',
       });
-      console.log('response image', imageName);
       const response1 = await axios.post(
         'http://65.2.123.63:8080/api/v1/fileAttachment/file',
         formData,
@@ -184,11 +187,6 @@ function BorrowRequestScreen() {
           `Error Uploading QR Code: ${response1.status} ${response1.statusText}`,
           ToastAndroid.SHORT,
           ToastAndroid.CENTER,
-        );
-        console.log(
-          'Error Uploading QR Code:',
-          response1.status,
-          response1.statusText,
         );
       }
 
