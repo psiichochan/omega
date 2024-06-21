@@ -69,9 +69,7 @@ const HomeScreen = ({route, navigation}) => {
       } else if (response.status === 204) {
         setTotalDonations(0);
       }
-    } catch (e) {
-      console.log('error in get donations: ', e);
-    }
+    } catch (e) {}
   }, [selectedValue]);
 
   const getExpenses = useCallback(async () => {
@@ -111,9 +109,7 @@ const HomeScreen = ({route, navigation}) => {
         setCountOfUnApprovedUsers(countOfUnApprovedUsers1);
         setCountOfPendingUsers(countOfPendingUsers1);
       }
-    } catch (error) {
-      console.log('this is error while fetching users count==> ', error);
-    }
+    } catch (error) {}
   }, [selectedValue]);
 
   useEffect(() => {

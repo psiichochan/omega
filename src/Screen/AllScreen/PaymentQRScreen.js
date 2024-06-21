@@ -45,9 +45,7 @@ const PaymentQRScreen = ({navigation, route}) => {
 
         setImageName(name);
       }
-    } catch (error) {
-      console.log('ImagePicker Error: ', error);
-    }
+    } catch (error) {}
   };
 
   const [loading, setIsLoading] = useState(false);
@@ -60,11 +58,6 @@ const PaymentQRScreen = ({navigation, route}) => {
       if (response.status === 200) {
         setBankDetails(response.data[0]);
       } else {
-        console.log(
-          'Error saving bank details:',
-          response.status,
-          response.statusText,
-        );
       }
     } catch (error) {
       console.error('Error during API request:', error);

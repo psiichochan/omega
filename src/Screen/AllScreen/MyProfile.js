@@ -65,9 +65,7 @@ function MyProfileScreen() {
         setqrImage1(imagePath);
         setImageName1(name1);
       }
-    } catch (error) {
-      console.log('ImagePicker Error: ', error);
-    }
+    } catch (error) {}
   };
 
   const handleImageSelect2 = async () => {
@@ -84,9 +82,7 @@ function MyProfileScreen() {
         setqrImage2(imagePath);
         setImageName2(name1);
       }
-    } catch (error) {
-      console.log('ImagePicker Error: ', error);
-    }
+    } catch (error) {}
   };
 
   async function ImageUpload1() {
@@ -262,9 +258,7 @@ function MyProfileScreen() {
       if (response.status === 200) {
         setDetails(response.data);
       }
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   }, [userName]);
   const GetQrImage = useCallback(async () => {
     try {

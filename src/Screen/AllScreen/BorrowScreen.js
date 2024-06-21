@@ -139,9 +139,10 @@ const BorrowScreen = () => {
         );
         setBorrowApprovedRecords([]);
       } else {
-        console.log(
-          'Failed to fetch expenses list. Server response:',
-          response.status,
+        ToastAndroid.showWithGravity(
+          `Failed to fetch expenses list. Server response: ${response.status} `,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
         );
       }
     } catch (error) {

@@ -109,9 +109,7 @@ const ExpensesScreen = () => {
         const totalAmount = response.data.totalAmount;
         setTotalDonation(totalAmount);
       }
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   const getTotalBorrow = async () => {
@@ -130,9 +128,7 @@ const ExpensesScreen = () => {
         const totalAmount = response.data.totalAmount;
         setTotalBorrow(totalAmount);
       }
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -197,9 +193,7 @@ const ExpensesScreen = () => {
         setImageName(name);
         setSelectedImage(true);
       }
-    } catch (error) {
-      console.log('ImagePicker Error: ', error);
-    }
+    } catch (error) {}
   };
 
   async function ImageUpload() {
@@ -231,11 +225,6 @@ const ExpensesScreen = () => {
           `Error Uploading Receipt Code: ${response.status} ${response.statusText}`,
           ToastAndroid.SHORT,
           ToastAndroid.CENTER,
-        );
-        console.log(
-          'Error Uploading Receipt Code:',
-          response.status,
-          response.statusText,
         );
       }
     } catch (error) {
@@ -316,8 +305,6 @@ const ExpensesScreen = () => {
         setQRImage('');
         fetchExpensesList();
         setSelectedImage(false);
-      } else {
-        console.log('Failed to add expense. Server response:', response.status);
       }
     } catch (error) {
       console.error('Error making expense:', error);
