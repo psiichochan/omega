@@ -33,10 +33,9 @@ const TabNavigator = ({route}) => {
         screenOptions={({routes}) => ({
           tabBarIcon: ({}) => {
             let iconName;
-
-            if (routes.name === 'Home') {
+            if (route.name === 'Home') {
               iconName = require('../../../assets/AllImages/home.png');
-            } else if (routes.name === 'Profile') {
+            } else if (route.name === 'Profile') {
               iconName = require('../../../assets/AllImages/profile.png');
             }
             return <Image source={iconName} style={{width: 30, height: 30}} />;

@@ -100,11 +100,18 @@ const HomeScreen = ({route, navigation}) => {
 
       const response = await axios.get(apiUrl);
 
-      if (response.status === 200) {
+      if (response.status === 204) {
         const countOfApprovedUsers1 = response.data['Approved Users'].length;
         const countOfUnApprovedUsers1 =
           response.data['Unapproved Users'].length;
         const countOfPendingUsers1 = response.data['Pending Users'].length;
+        console.log(
+          'data: ',
+          countOfApprovedUsers1,
+          countOfUnApprovedUsers1,
+          countOfPendingUsers1,
+        );
+
         setCountOfApprovedUsers(countOfApprovedUsers1);
         setCountOfUnApprovedUsers(countOfUnApprovedUsers1);
         setCountOfPendingUsers(countOfPendingUsers1);
@@ -146,7 +153,7 @@ const HomeScreen = ({route, navigation}) => {
           placeholder={{
             label: 'Select Filter',
             value: null,
-            color: 'black',
+            color: 'pink',
             fontWeight: 'bold',
           }}
           onValueChange={value => setSelectedValue(value)}
