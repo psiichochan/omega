@@ -20,7 +20,7 @@ import {
 
 const Drawer = createDrawerNavigator();
 
-const ExpandableList = ({nav, items, onMainListClick, onSubListClick}) => {
+const ExpandableList = ({nav, items, onMainListClick}) => {
   const [selectedValue, setSelectedValue] = useState(1);
 
   const renderItem = ({item, index}) => {
@@ -50,65 +50,83 @@ const ExpandableList = ({nav, items, onMainListClick, onSubListClick}) => {
     />
   );
 };
+
 function DrawerNavigator({navigation}) {
+  const [isAdmin, setIsAdmin] = useState(null);
+
+  useEffect(() => {
+    const GetIsAdmin = async () => {
+      const userDetails1 = await AsyncStorage.getItem('UserDetails');
+      const allDetails = JSON.parse(userDetails1);
+      const hello = allDetails.email === 'rpdhole25@gmail.com' ? true : false;
+      setIsAdmin(hello);
+      console.log('isAdmin: ', hello);
+    };
+    GetIsAdmin();
+  }, []);
+
   const items = [
     {
       title: 'Member Management',
       value: 'Value 1',
       componentName: 'MemberManagement',
+      adminOnly: true,
     },
     {
       title: 'Payment Management',
       value: 'Value 2',
       componentName: 'PaymentManagement',
+      // adminOnly: true, // Add this property for admin-only items
     },
-
     {
       title: 'Send Notifications',
       value: 'Value 5',
       componentName: 'SendMessageScreen',
+      adminOnly: true,
     },
-
+    {
+      title: 'Notification',
+      value: 'Value 11',
+      componentName: 'Notification',
+    },
     {
       title: 'Reports',
       value: 'Value 10',
       componentName: 'ReportsScreen',
     },
-
     {
       title: 'App Settings',
       value: 'Value 12',
       componentName: 'BasicInfo',
+      adminOnly: true,
     },
-
     {
       title: 'Log Out',
       value: 'Value 13',
       componentName: 'Log Out',
     },
   ];
+
   const navigateToScreen = (nav, screenName, data) => {
     switch (screenName) {
       case 'MemberManagement':
         nav.navigate('MemberManagement');
         break;
-
       case 'PaymentManagement':
         nav.navigate('PaymentManagement');
         break;
-
       case 'SendMessageScreen':
         nav.navigate('SendMessageScreen');
         break;
-
+      case 'Notification':
+        nav.navigate('NotificationScreen');
+        break;
       case 'ReportsScreen':
         nav.navigate('ReportsScreen');
         break;
-
       case 'BasicInfo':
         nav.navigate('BasicInfo');
         break;
-
       case 'Log Out':
         Alert.alert(
           'Logout',
@@ -133,11 +151,11 @@ function DrawerNavigator({navigation}) {
           {cancelable: true},
         );
         break;
-
       default:
         return null;
     }
   };
+
   const onClickMainMenu = (nav, item, subIndex) => {
     navigateToScreen(nav, item.componentName, null);
   };
@@ -167,36 +185,36 @@ function DrawerNavigator({navigation}) {
       const base64Icon = `data:image/png;base64,${base64Url}`;
       profileData = base64Icon;
       setImageUrl(profileData);
-    } else {
     }
     return profileData;
   }
+
   useEffect(() => {
     GetUserDetails();
     GetMyProfileData();
-  });
+  }, [imageName]);
+
+  const filteredItems = items.filter(item => !item.adminOnly || isAdmin);
+
   return (
     <Drawer.Navigator
-      drawerContent={props => {
-        return (
-          <View>
-            {imageName ? (
-              <Image source={{uri: imageUrl}} style={styles.imageQR} />
-            ) : (
-              <Image
-                source={require('../../../assets/AllImages/profilePic.jpg')}
-                style={styles.imageQR}
-              />
-            )}
-
-            <ExpandableList
-              nav={navigation}
-              items={items}
-              onMainListClick={onClickMainMenu}
+      drawerContent={props => (
+        <View>
+          {imageName ? (
+            <Image source={{uri: imageUrl}} style={styles.imageQR} />
+          ) : (
+            <Image
+              source={require('../../../assets/AllImages/profilePic.jpg')}
+              style={styles.imageQR}
             />
-          </View>
-        );
-      }}>
+          )}
+          <ExpandableList
+            nav={navigation}
+            items={filteredItems}
+            onMainListClick={onClickMainMenu}
+          />
+        </View>
+      )}>
       <Drawer.Screen
         name="Home"
         component={TabNavigator}
@@ -212,7 +230,6 @@ const styles = StyleSheet.create({
   drawerLabelStyle: {
     fontSize: hp(1.9),
     fontWeight: '700',
-
     color: '#1B1B1B',
   },
   imageQR: {

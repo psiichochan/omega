@@ -43,10 +43,6 @@ function UserDetails() {
     }
   };
 
-  // const getStatusColor = status => {
-  //   return status ? 'green' : 'red';
-  // };
-
   const showUserDetails = user => {
     // Navigate to the next screen and pass the id and username
     navigation.navigate('UserTransactionRecords', {

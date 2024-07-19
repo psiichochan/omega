@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function PaymentManagement({navigation}) {
   const navigateToPaymentRequest = () => {
@@ -9,11 +10,31 @@ function PaymentManagement({navigation}) {
   const navigateToUserDetails = () => {
     navigation.navigate('UserDetails');
   };
+
+  const [isAdmin, setIsAdmin] = useState(null);
+
+  const getUserDetails = async () => {
+    const userDetails1 = await AsyncStorage.getItem('UserDetails');
+    const allDetails = JSON.parse(userDetails1);
+    const hello = allDetails.email === 'rpdhole25@gmail.com' ? true : false;
+    console.log('hello :', hello);
+    setIsAdmin(hello);
+  };
+  useEffect(() => {
+    getUserDetails();
+  }, []);
   return (
     <View style={styles.mainContainer}>
-      <TouchableOpacity style={styles.card} onPress={navigateToPaymentRequest}>
-        <Text style={styles.cardTitle}>Payment Management</Text>
-      </TouchableOpacity>
+      {isAdmin === true ? (
+        <TouchableOpacity
+          style={styles.card}
+          onPress={navigateToPaymentRequest}>
+          <Text style={styles.cardTitle}>Payment Management</Text>
+        </TouchableOpacity>
+      ) : (
+        <View />
+      )}
+
       <TouchableOpacity style={styles.card} onPress={navigateToUserDetails}>
         <Text style={styles.cardTitle}>Member History</Text>
       </TouchableOpacity>

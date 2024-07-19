@@ -66,8 +66,7 @@ const HomeScreen = ({route, navigation}) => {
       );
       if (response.status === 200) {
         setTotalDonations(response.data.totalAmount);
-      } else if (response.status === 204) {
-        setTotalDonations(0);
+        console.log('total Donations: ', response.data.totalAmount);
       }
     } catch (e) {}
   }, [selectedValue]);
@@ -96,28 +95,17 @@ const HomeScreen = ({route, navigation}) => {
 
   const GetUserCount = useCallback(async () => {
     try {
-      const apiUrl = `http://65.2.123.63:8080/api/v1/userController/user/filter?filter=${selectedValue}`;
+      const apiUrl = 'http://65.2.123.63:8080/api/v1/userController/getAllUser';
 
       const response = await axios.get(apiUrl);
 
-      if (response.status === 204) {
-        const countOfApprovedUsers1 = response.data['Approved Users'].length;
-        const countOfUnApprovedUsers1 =
-          response.data['Unapproved Users'].length;
-        const countOfPendingUsers1 = response.data['Pending Users'].length;
-        console.log(
-          'data: ',
-          countOfApprovedUsers1,
-          countOfUnApprovedUsers1,
-          countOfPendingUsers1,
-        );
+      if (response.status === 200) {
+        const countOftheUsers = response.data;
 
-        setCountOfApprovedUsers(countOfApprovedUsers1);
-        setCountOfUnApprovedUsers(countOfUnApprovedUsers1);
-        setCountOfPendingUsers(countOfPendingUsers1);
+        setCountOfApprovedUsers(countOftheUsers.length);
       }
     } catch (error) {}
-  }, [selectedValue]);
+  }, []);
 
   useEffect(() => {
     getApprovedDonations();
@@ -127,7 +115,6 @@ const HomeScreen = ({route, navigation}) => {
     calculateAvailableExpense();
   }, [
     GetUserCount,
-    calculateAvailableExpense,
     getApprovedBorrow,
     getApprovedDonations,
     getExpenses,
@@ -140,8 +127,11 @@ const HomeScreen = ({route, navigation}) => {
       totalBorrow !== undefined &&
       totalExpenses !== undefined
     ) {
+      console.log('everything : ', totalDonations, totalBorrow, totalExpenses);
       const adminAvailableExpense =
         totalDonations - totalBorrow - totalExpenses;
+      console.log('everything : ', adminAvailableExpense);
+
       setAvailableExpense(adminAvailableExpense);
     }
   }, [totalBorrow, totalDonations, totalExpenses]);

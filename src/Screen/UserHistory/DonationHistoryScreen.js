@@ -40,20 +40,24 @@ function DonationHistoryScreen({userId, userName}) {
       <Text style={styles.totalDonation}>
         Total Donations:Rs. {totalDonations}{' '}
       </Text>
-      <FlatList
-        data={donationHistory}
-        keyExtractor={item => item.id.toString()}
-        renderItem={({item}) => (
-          <View style={styles.card}>
-            <Text style={styles.text}>Amount: {item.amount}</Text>
-            <Text style={styles.text}>Note: {item.note}</Text>
-            <Text style={styles.text}>Date: {item.date}</Text>
-            <Text style={styles.text}>
-              Status: {item.status ? 'Approved' : 'Not Approved'}
-            </Text>
-          </View>
-        )}
-      />
+      {donationHistory.length === 0 || null ? (
+        <Text style={styles.dataNotAvailable}>No History is Available</Text>
+      ) : (
+        <FlatList
+          data={donationHistory}
+          keyExtractor={item => item.id.toString()}
+          renderItem={({item}) => (
+            <View style={styles.card}>
+              <Text style={styles.title}>Amount: {item.amount}</Text>
+              <Text style={styles.text}>Note: {item.note}</Text>
+              <Text style={styles.text}>Date: {item.date}</Text>
+              <Text style={styles.text}>
+                Status: {item.status ? 'Approved' : 'Not Approved'}
+              </Text>
+            </View>
+          )}
+        />
+      )}
     </View>
   );
 }
@@ -63,6 +67,12 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: 'white',
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    color: 'white',
   },
   card: {
     backgroundColor: '#00539C',
@@ -77,7 +87,19 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginBottom: 8,
   },
-  totalDonation: {fontSize: 15, fontWeight: 'bold', color: 'black'},
+  totalDonation: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: 'black',
+    marginBottom: 16,
+  },
+  dataNotAvailable: {
+    fontSize: 20,
+    color: 'red',
+    fontWeight: 'bold',
+    margin: 50,
+    alignSelf: 'center',
+  },
 });
 
 export default DonationHistoryScreen;

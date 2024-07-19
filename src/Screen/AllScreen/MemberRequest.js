@@ -10,41 +10,44 @@ import {
   TouchableOpacity,
   ToastAndroid,
   ActivityIndicator,
+  Modal,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 
-function Card({profile, onApprove, onDecline}) {
+function Card({profile, onCardPress, onApprove, onDecline}) {
   return (
-    <View style={styles.card}>
-      <View style={styles.leftContainer}>
-        <Image
-          style={styles.profileImage}
-          source={require('./../../../assets/AllImages/profilePic.jpg')}
-        />
-      </View>
-      <View style={styles.rightContainer}>
-        <Text style={styles.profileName}>
-          {profile.firstName} {profile.lastName}
-        </Text>
-        <Text style={styles.profileInfo}>{profile.mobileNo}</Text>
-        <Text style={styles.profileInfo}>{profile.address}</Text>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.approveButton}
-            onPress={() => onApprove(profile.id)}>
-            <Text style={styles.buttonText}>Approve</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.declineButton}
-            onPress={() => onDecline(profile.id)}>
-            <Text style={styles.buttonText}>Decline</Text>
-          </TouchableOpacity>
+    <TouchableOpacity onPress={() => onCardPress(profile)}>
+      <View style={styles.card}>
+        <View style={styles.leftContainer}>
+          <Image
+            style={styles.profileImage}
+            source={require('./../../../assets/AllImages/profilePic.jpg')}
+          />
+        </View>
+        <View style={styles.rightContainer}>
+          <Text style={styles.profileName}>
+            {profile.firstName} {profile.lastName}
+          </Text>
+          <Text style={styles.profileInfo}>{profile.mobileNo}</Text>
+          <Text style={styles.profileInfo}>{profile.address}</Text>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.approveButton}
+              onPress={() => onApprove(profile.id)}>
+              <Text style={styles.buttonText}>Approve</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.declineButton}
+              onPress={() => onDecline(profile.id)}>
+              <Text style={styles.buttonText}>Decline</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -52,6 +55,8 @@ function MemberRequest() {
   const [profiles, setProfiles] = useState([]);
   const [contain, setContain] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedProfile, setSelectedProfile] = useState(null);
 
   const getUnapprovedUser = async () => {
     try {
@@ -84,6 +89,7 @@ function MemberRequest() {
       setLoading(false); // Set loading to false regardless of success or failure
     }
   };
+
   useEffect(() => {
     getUnapprovedUser();
   }, []);
@@ -152,6 +158,16 @@ function MemberRequest() {
     }
   };
 
+  const handleCardPress = profile => {
+    setSelectedProfile(profile);
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    setSelectedProfile(null);
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {loading ? ( // Display loader if loading is true
@@ -162,6 +178,7 @@ function MemberRequest() {
             <Card
               key={profile.id}
               profile={profile}
+              onCardPress={handleCardPress}
               onApprove={handleApprove}
               onDecline={handleDecline}
             />
@@ -175,6 +192,41 @@ function MemberRequest() {
           )}
         </React.Fragment>
       )}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={handleCloseModal}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            {selectedProfile && (
+              <>
+                <Text style={styles.modalTitle}>
+                  {selectedProfile.firstName} {selectedProfile.lastName}
+                </Text>
+
+                <Text style={styles.modalText}>
+                  Username: {selectedProfile.username}
+                </Text>
+                <Text style={styles.modalText}>
+                  Mobile: {selectedProfile.mobileNo}
+                </Text>
+                <Text style={styles.modalText}>
+                  EmailID: {selectedProfile.email}
+                </Text>
+                <Text style={styles.modalText}>
+                  Address: {selectedProfile.address}
+                </Text>
+                <TouchableOpacity
+                  style={styles.closeButton}
+                  onPress={handleCloseModal}>
+                  <Text style={styles.buttonText}>Close</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -249,6 +301,39 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: '80%',
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: 'black',
+  },
+  modalText: {
+    fontSize: 16,
+    marginBottom: 10,
+    color: 'black',
+  },
+  closeButton: {
+    backgroundColor: '#00539C',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  closeButtonText: {
     color: 'white',
     fontWeight: 'bold',
   },

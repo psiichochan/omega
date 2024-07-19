@@ -12,9 +12,12 @@ function UserTransactionRecords({route}) {
 
   return (
     <Tab.Navigator
-      tabBarOptions={{
-        labelStyle: {fontSize: 14, fontWeight: 'bold', color: 'white'}, // Style for the tab labels
-        tabStyle: {backgroundColor: '#00539C'}, // Style for each tab
+      screenOptions={{
+        activeTintColor: 'white',
+        inactiveTintColor: 'gray',
+        style: {backgroundColor: '#00569C'},
+        labelStyle: {fontSize: 15, fontWeight: 'bold'},
+        indicatorStyle: {backgroundColor: '#00569C'},
       }}>
       <Tab.Screen name="Donation History" options={{title: 'Donation History'}}>
         {() => <DonationHistoryScreen userId={userId} userName={userName} />}

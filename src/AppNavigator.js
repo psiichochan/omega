@@ -29,6 +29,8 @@ import SendMessageScreen from './Screen/Notification/SendMessageScreen';
 import BasicInfo from './Screen/AppSettings/BasicInfo';
 import RequestTabs from './Screen/AllScreen/RequestTabs';
 import UserDetails from './Screen/UserHistory/UserDetailsScreen';
+import UserTransactionRecords from './Screen/UserHistory/UserTransactionRecords';
+import NotificationScreen from './Screen/Notification/NotificationScreen';
 
 const Stack = createStackNavigator();
 export default function AppNavigator() {
@@ -101,6 +103,11 @@ export default function AppNavigator() {
           options={{headerShown: false}}
         />
         <Stack.Screen
+          name="NotificationScreen"
+          component={NotificationScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
           name="MemberDetails"
           component={MemberDetails}
           options={{headerShown: false}}
@@ -160,14 +167,19 @@ export default function AppNavigator() {
           component={BorrowScreenReports}
           options={{headerShown: false}}
         />
-        <Stack.Screen
+        {/* <Stack.Screen
           name="ProfileScreen"
           component={ProfileScreen}
           options={{headerShown: false}}
-        />
+        /> */}
         <Stack.Screen
           name="MyProfileScreen"
           component={MyProfileScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="UserTransactionRecords"
+          component={UserTransactionRecords}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

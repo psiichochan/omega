@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */ /* eslint-disable prettier/prettier */
 import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, ScrollView, ToastAndroid} from 'react-native';
+import {View, Text, StyleSheet, ToastAndroid, FlatList} from 'react-native';
 import axios from 'axios';
 
 const BorrowHistoryScreen = ({userId, userName}) => {
@@ -31,27 +31,35 @@ const BorrowHistoryScreen = ({userId, userName}) => {
   }, []);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.container}>
       <Text style={styles.totalBorrow}>Total Borrow:Rs. {totalBorrow} </Text>
-      {borrowHistory.map(item => (
-        <View key={item.borrowingId} style={styles.card}>
-          <Text style={styles.title}>Amount: {item.amount}</Text>
-          <Text style={styles.text}>Note: {item.note}</Text>
-          <Text style={styles.text}>Borrower: {item.borrowerName}</Text>
-          <Text style={styles.text}>Borrowed Date: {item.borrowedDate}</Text>
-          <Text style={styles.text}>
-            Status: {item.status ? 'Approved' : 'Pending'}
-          </Text>
-        </View>
-      ))}
-    </ScrollView>
+      {borrowHistory.length === 0 || null ? (
+        <Text style={styles.dataNotAvailable}>No History is Available</Text>
+      ) : (
+        <FlatList
+          data={borrowHistory}
+          keyExtractor={item => item.id}
+          renderItem={({item}) => (
+            <View style={styles.card}>
+              <Text style={styles.title}>Amount: {item.amount}</Text>
+              <Text style={styles.text}>Note: {item.note}</Text>
+              <Text style={styles.text}>Date: {item.borrowedDate}</Text>
+              <Text style={styles.text}>
+                Status: {item.status ? 'Approved' : 'Not Approved'}
+              </Text>
+            </View>
+          )}
+        />
+      )}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
     flex: 1,
+    // padding: 16,
+    paddingHorizontal: 10,
     backgroundColor: 'white',
   },
   card: {
@@ -61,7 +69,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     elevation: 4,
   },
-  totalBorrow: {fontSize: 15, fontWeight: 'bold', color: 'black'},
+  totalBorrow: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: 'black',
+    // marginBottom: 16,
+    marginVertical: 16,
+  },
   text: {
     color: 'white',
     fontWeight: '500',
@@ -72,6 +86,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 8,
     color: 'white',
+  },
+  dataNotAvailable: {
+    fontSize: 20,
+    color: 'red',
+    fontWeight: 'bold',
+    margin: 50,
+    alignSelf: 'center',
   },
 });
 
